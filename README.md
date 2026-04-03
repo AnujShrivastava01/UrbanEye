@@ -1,1 +1,1 @@
-# UrbanEye
+UrbanEye is a full-stack civic issue management system that connects citizens, field officers, and government administrators. Citizens report infrastructure problems (potholes, garbage, broken streetlights) via a mobile app or web interface. The system uses the **UrbanAI Engine** to analyze uploaded images, auto-categorize issues, and predict potential infrastructure failures based on weather data and historical patterns.
