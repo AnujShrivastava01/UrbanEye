@@ -149,7 +149,7 @@ def load_users():
 
 # Initialize Flask app
 app = Flask(__name__)
-CORS(app, origins=['*'])  # Enable CORS for Flutter app integration
+CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True, allow_headers=["Content-Type", "Authorization", "X-Requested-With"], methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"])
 
 # Email Configuration
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
