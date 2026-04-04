@@ -21,9 +21,12 @@ const ProtectedRoute = ({ children, roles = [] }) => {
     }
 
     if (!hasRole(roles)) {
+        // Super admin can access anything
+        if (user.role === 'super_admin') {
+            return children;
+        }
+        
         // User authenticated but not authorized — redirect to dashboard instead of a dead-end
-        // This handles edge cases where role doesn't match (e.g., stale token)
-        console.warn(`[ProtectedRoute] User role "${user.role}" not in allowed roles:`, roles);
         return <Navigate to="/dashboard" replace />;
     }
 
