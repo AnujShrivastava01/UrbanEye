@@ -9,8 +9,12 @@
     --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
-body {
+html, body {
     margin: 0;
+    overflow-x: hidden;
+}
+
+body {
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;

@@ -1181,14 +1181,14 @@ const CivilianDashboard = ({ user }) => {
 
 
     return (
-        <div className="flex min-h-screen bg-[#f8fafc] font-sans antialiased text-slate-900 overflow-hidden">
+        <div className="fixed top-[44px] left-0 right-0 bottom-0 flex bg-[#f8fafc] font-sans antialiased text-slate-900 overflow-hidden">
             <AnimatePresence>
                 {selectedReport && <ReportDetailModal />}
                 {showPassport && <CivicPassportModal />}
             </AnimatePresence>
 
             {/* Sidebar */}
-            <aside className={cn("sticky top-0 h-screen bg-white border-r border-slate-100 flex flex-col transition-all duration-500 z-50 shadow-xl", sidebarCollapsed ? "w-[90px]" : "w-[280px]")}>
+            <aside className={cn("relative h-full bg-white border-r border-slate-100 flex flex-col transition-all duration-500 z-50 shadow-xl shrink-0 overflow-visible", sidebarCollapsed ? "w-[90px]" : "w-[280px]")}>
                 <div className="p-6 mb-4">
                     <div className="flex items-center gap-4">
                         <div className="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center text-white shadow-lg shrink-0">
@@ -1222,7 +1222,7 @@ const CivilianDashboard = ({ user }) => {
             </aside>
 
             {/* Main Content */}
-            <main className="flex-1 max-w-[1500px] mx-auto px-8 py-10 lg:px-16 h-screen overflow-y-auto scroll-smooth">
+            <main className="flex-1 min-w-0 px-8 py-10 lg:px-16 h-full overflow-y-auto overflow-x-hidden scroll-smooth">
                 <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12 border-b border-slate-100 pb-8">
                     <div>
                         <h1 className="text-4xl font-black text-slate-900 tracking-tighter mb-1">
