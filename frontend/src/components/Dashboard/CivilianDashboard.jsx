@@ -1,16 +1,15 @@
 import { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
-import * as Icons from 'lucide-react';
-const {
+import { 
     MapPin, Calendar, CheckCircle, Zap, ArrowRight, TrendingUp,
     LayoutDashboard, FileText, Shield, LogOut, RefreshCw, X,
-    Edit2, ExternalLink, BarChart3, Activity, PieChart: PieIcon, Map,
+    Edit2, ExternalLink, BarChart3, Activity, PieChart as PieIcon, Map, Map as MapIcon,
     ChevronLeft, ChevronRight, Building, Download, Sparkles, CloudRain,
     Newspaper, Plus, Clock, UserPlus, BadgeIndianRupee, Image, Loader2,
     Brain, Flame, Wifi, Link2, AlertOctagon, Gauge, History, Milestone,
-    Gift, Coffee, ParkingCircle, Home: HomeIcon, Filter, Globe, Building2, Medal, Award, Users, Trophy, List, Map: MapIcon, AlertTriangle, Settings,
+    Gift, Coffee, ParkingCircle, Home as HomeIcon, Filter, Globe, Building2, Medal, Award, Users, Trophy, List, AlertTriangle, Settings,
     Briefcase, Heart, Star, User
-} = Icons;
+} from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { clsx } from 'clsx';
@@ -673,7 +672,7 @@ const CivilianDashboard = ({ user }) => {
                                     <div className="flex items-center justify-between mb-3">
                                         <div className="flex items-center gap-3">
                                             <div className={cn("p-3 rounded-2xl text-white shadow-lg", pred.risk.includes('High') ? "bg-red-500" : "bg-indigo-500")}>
-                                                <Icons.AlertTriangle size={20} />
+                                                <AlertTriangle size={20} />
                                             </div>
                                             <div>
                                                 <h5 className="font-black text-slate-900 leading-none">{pred.type}</h5>
