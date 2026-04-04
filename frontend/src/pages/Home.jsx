@@ -1066,7 +1066,7 @@ const Home = () => {
                         </div>
                         <div className="text-center md:text-left">
                             <p className="text-slate-400 text-sm">
-                                © 2026 UrbanEye by Team Solaris, MITS Gwalior
+                                © 2026 UrbanEye by Team Thankyou, MITS Gwalior
                             </p>
 
                         </div>

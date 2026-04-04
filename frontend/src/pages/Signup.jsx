@@ -190,16 +190,16 @@ const Signup = () => {
                             <p className="text-slate-500 mt-1">Create your free account</p>
                         </div>
 
-                        {/* Google Sign Up Button (Temporarily Disabled to prevent 403 Origin Errors) */}
+                        {/* Google Sign Up Button */}
                         <div className="mb-6 flex justify-center">
-                            {/* <GoogleLogin
+                            <GoogleLogin
                                 onSuccess={handleGoogleSuccess}
                                 onError={() => setError('Google signup failed')}
                                 theme="outline"
                                 size="large"
                                 text="signup_with"
                                 shape="pill"
-                            /> */}
+                            />
                         </div>
 
                         <div className="flex items-center gap-4 mb-6">
