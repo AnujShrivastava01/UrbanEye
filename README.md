@@ -515,7 +515,7 @@ This project is licensed under the **MIT License**. See the [LICENSE](LICENSE) f
         <img src="https://github.com/Pushpendra-7-ux.png" width="100" style="border-radius:50%"/><br/>
         <sub><b>Pushpendra</b></sub>
       </a><br/>
-      <sub>🎨 UI/UX Developer</sub><br/>
+      <sub>📱 Mobile Developer</sub><br/>
       <a href="https://github.com/Pushpendra-7-ux">
         <img src="https://img.shields.io/badge/GitHub-Pushpendra--7--ux-181717?style=flat-square&logo=github"/>
       </a>
@@ -525,7 +525,7 @@ This project is licensed under the **MIT License**. See the [LICENSE](LICENSE) f
         <img src="https://github.com/Nandini-Jain4.png" width="100" style="border-radius:50%"/><br/>
         <sub><b>Nandini Jain</b></sub>
       </a><br/>
-      <sub>📱 Mobile Developer</sub><br/>
+      <sub>🎨 UI/UX Developer</sub><br/>
       <a href="https://github.com/Nandini-Jain4">
         <img src="https://img.shields.io/badge/GitHub-Nandini--Jain4-181717?style=flat-square&logo=github"/>
       </a>
