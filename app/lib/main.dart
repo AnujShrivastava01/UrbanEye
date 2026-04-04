@@ -5,10 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'firebase_options.dart';
 import 'views/auth/role_selection_page.dart';
-import 'views/auth/login_page.dart';
-import 'views/auth/signup_page.dart';
-import 'views/civilian/civilian_dashboard.dart';
-import 'views/social_worker/social_worker_dashboard.dart';
+import 'utils/app_colors.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -30,7 +27,7 @@ void main() async {
     SystemUiMode.edgeToEdge,
   );
 
-  // Initialize Firebase manually inside the generated main
+  // TODO: Initialize Firebase
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -69,9 +66,11 @@ class CivicReporterApp extends StatelessWidget {
         // Color Scheme
         colorScheme: ColorScheme.fromSeed(
           seedColor: AppColors.primary,
+          brightness: Brightness.light,
           primary: AppColors.primary,
           secondary: AppColors.secondary,
           surface: AppColors.surface,
+          background: AppColors.background,
           error: AppColors.error,
         ),
 
@@ -303,7 +302,7 @@ class CivicReporterApp extends StatelessWidget {
           titleTextStyle: GoogleFonts.poppins(
             fontSize: 20,
             fontWeight: FontWeight.w600,
-            color: AppColors.textPrimary,
+            color: AppColors.textPrimary, // fixed from textDark
           ),
           contentTextStyle: GoogleFonts.inter(
             fontSize: 14,
@@ -354,21 +353,15 @@ class CivicReporterApp extends StatelessWidget {
         splashFactory: InkRipple.splashFactory,
       ),
 
-      // Routing for the App
-      initialRoute: '/',
-      routes: {
-        '/': (context) => const RoleSelectionPage(),
-        '/login': (context) => const LoginPage(),
-        '/signup': (context) => const SignupPage(),
-        '/civilian_dashboard': (context) => const CivilianDashboard(),
-        '/social_worker_dashboard': (context) => const SocialWorkerDashboard(),
-      },
+      // Routes and Navigation
+      home: const RoleSelectionPage(),
 
       // Global Builder for additional customizations
       builder: (context, child) {
         return MediaQuery(
           // Prevent text scaling beyond reasonable limits
-          data: MediaQuery.of(context).copyWith(),
+          data: MediaQuery.of(context).copyWith(
+          ),
           child: child!,
         );
       },
