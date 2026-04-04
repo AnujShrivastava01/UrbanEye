@@ -8,7 +8,7 @@ const {
     ChevronLeft, ChevronRight, Building, Download, Sparkles, CloudRain,
     Newspaper, Plus, Clock, UserPlus, BadgeIndianRupee, Image, Loader2,
     Brain, Flame, Wifi, Link2, AlertOctagon, Gauge, History, Milestone,
-    Gift, Coffee, ParkingCircle, Home: HomeIcon, Filter, Globe, Building2, Medal
+    Gift, Coffee, ParkingCircle, Home: HomeIcon, Filter, Globe, Building2, Medal, Award, Users, Trophy, List, Map: MapIcon, AlertTriangle
 } = Icons;
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
