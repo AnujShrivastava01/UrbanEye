@@ -52,8 +52,15 @@ const CivilianDashboard = ({ user }) => {
     const [ngoRequests, setNgoRequests] = useState([]);
     const [claimedRewards, setClaimedRewards] = useState([]);
     const [showPassport, setShowPassport] = useState(false);
+    const [hiringModal, setHiringModal] = useState({ show: false, reportId: null, worker: null });
     
-    // Mock achievements for demo
+    // Mock workers for Marketplace demo
+    const mockWorkers = [
+        { id: 1, name: 'Rahul Sharma', specialty: 'Pothole Specialist', rating: 4.9, completed: 124, price: 299, image: 'https://i.pravatar.cc/150?u=rahul' },
+        { id: 2, name: 'Priya Verma', specialty: 'Electrician (Lights)', rating: 4.8, completed: 89, price: 199, image: 'https://i.pravatar.cc/150?u=priya' },
+        { id: 3, name: 'Amit Kumar', specialty: 'Sanitation Expert', rating: 4.7, completed: 212, price: 399, image: 'https://i.pravatar.cc/150?u=amit' },
+    ];
+
     const achievements = [
         { id: 1, title: 'First Responder', desc: 'Submitted your first report', date: '2024-03-24', icon: Zap, color: 'bg-amber-400' },
         { id: 2, title: 'XP Centurion', desc: 'Reached 100+ XP milestone', date: '2024-03-28', icon: TrendingUp, color: 'bg-indigo-500' },
@@ -184,13 +191,29 @@ const CivilianDashboard = ({ user }) => {
     };
 
     const handleHireGig = async (reportId) => {
-        if (!window.confirm("Do you want to hire a private Gig Worker for fast resolution (₹300)?")) return;
+        // Find a suitable worker for the report type, or default to the first one
+        const worker = mockWorkers[0]; // In a real app, this would be an API match
+        setHiringModal({ show: true, reportId, worker, loading: false });
+    };
+
+    const confirmHire = async () => {
+        const { reportId, worker, serviceType = 'express' } = hiringModal;
+        setHiringModal({ ...hiringModal, loading: true });
         try {
-            await axios.post(`${API_BASE}/gig/jobs`, { report_id: reportId, service_type: 'gig' }, getAuthHeaders());
-            alert("Gig Worker Request Sent! Tracking enabled.");
-            fetchMyReports();
+            // Updated to call the unified bookings endpoint which handles Job creation on backend
+            await axios.post(`${API_BASE}/bookings`, { 
+                report_id: reportId, 
+                service_type: serviceType,
+                time_slot: 'today_morning' 
+            }, getAuthHeaders());
+            
+            setHiringModal({ show: false, reportId: null, worker: null });
+            fetchMyReports(); // Refresh to see "assigned" status
+            fetchMyBookings(); // Refresh to see the new booking
         } catch (err) {
-            alert("Could not process request. Job might already exist.");
+            console.error("Hiring failed", err);
+            alert(err.response?.data?.message || "Hiring failed. Please try again.");
+            setHiringModal({ show: false, reportId: null, worker: null });
         }
     };
 
@@ -538,12 +561,18 @@ const CivilianDashboard = ({ user }) => {
                                 <p className="mt-6 text-slate-400 font-bold">Synchronizing data...</p>
                             </div>
                         ) : reports.length === 0 ? (
-                            <div className="bg-white rounded-[3rem] p-16 text-center shadow-2xl shadow-slate-100 border border-slate-50">
-                                <AlertTriangle size={40} className="mx-auto mb-4 text-indigo-500" />
-                                <h3 className="text-2xl font-black text-slate-800 mb-2">No reports yet</h3>
-                                <p className="text-slate-500 mb-10 max-w-sm mx-auto font-medium">Start by creating a report to improve your locality.</p>
-                                <button onClick={() => navigate('/analyze')} className="bg-black text-white px-10 py-4 rounded-2xl font-black hover:scale-105 transition-transform">
-                                    Get Started
+                            <div className="bg-gradient-to-br from-slate-50 to-white rounded-[3.5rem] p-20 text-center shadow-2xl shadow-slate-100 border border-slate-100 space-y-6">
+                                <div className="w-24 h-24 bg-white rounded-[2rem] flex items-center justify-center mx-auto shadow-xl shadow-indigo-100 border border-indigo-50">
+                                    <AlertTriangle size={48} className="text-indigo-500" />
+                                </div>
+                                <div>
+                                    <h3 className="text-3xl font-black text-slate-800 tracking-tight">Your city is quiet.</h3>
+                                    <p className="text-slate-500 mt-2 max-w-sm mx-auto font-medium">You haven't reported any issues yet. Be the first responder in your neighborhood.</p>
+                                </div>
+                                <button onClick={() => navigate('/analyze')} className="group bg-indigo-600 hover:bg-slate-900 text-white px-10 py-5 rounded-[2rem] font-black transition-all transform hover:scale-105 active:scale-95 shadow-xl shadow-indigo-200 flex items-center gap-3 mx-auto">
+                                    <Plus size={24} /> 
+                                    <span>Start First Report</span>
+                                    <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
                                 </button>
                             </div>
                         ) : reports.map((report, idx) => (
@@ -882,36 +911,159 @@ const CivilianDashboard = ({ user }) => {
 
     // ========== GIG WORKERS SECTION ==========
     const GigWorkersSection = () => (
-        <div className="space-y-8">
-            <div className="flex justify-between items-center">
+        <div className="space-y-12">
+            {/* Header with quick stats */}
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                 <div>
-                    <h2 className="text-2xl font-black text-slate-900">Gig Worker Bookings</h2>
-                    <p className="text-slate-400 font-bold">Track your private service requests</p>
+                    <h2 className="text-4xl font-black text-slate-800 tracking-tight">Gig Services</h2>
+                    <p className="text-slate-500 mt-2 font-medium">Connect with verified professionals to resolve city issues fast.</p>
                 </div>
-                <button onClick={() => navigate('/book')} className="bg-indigo-600 text-white px-6 py-3 rounded-2xl font-black flex items-center gap-2 hover:bg-indigo-700">
-                    <Plus size={20} /> New Booking
+                <button onClick={() => navigate('/book')} 
+                    className="group bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-4 rounded-[2rem] font-black flex items-center gap-3 transition-all transform hover:scale-105 shadow-xl shadow-indigo-200">
+                    <Plus size={24} /> 
+                    <span>New Booking</span>
+                    <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
                 </button>
             </div>
-            {bookings.length === 0 ? (
-                <div className="bg-white rounded-[3rem] p-16 text-center border border-slate-100">
-                    <Users size={40} className="mx-auto mb-4 text-slate-300" />
-                    <h3 className="text-xl font-black text-slate-800 mb-2">No bookings yet</h3>
-                    <p className="text-slate-500 mb-6">Book a gig worker for faster issue resolution</p>
-                    <button onClick={() => navigate('/book')} className="bg-black text-white px-8 py-3 rounded-2xl font-black">Book Now</button>
+
+            {/* Marketplace Section - Always Visible for "Professional" look */}
+            <div className="space-y-6">
+                <div className="flex justify-between items-center px-4">
+                    <h3 className="text-xl font-bold text-slate-800 flex items-center gap-2">
+                        <Star className="text-amber-500 fill-amber-500" size={20} />
+                        Verified Professionals Nearby
+                    </h3>
+                    <span className="text-indigo-600 font-bold text-sm cursor-pointer hover:underline">View All</span>
                 </div>
-            ) : (
-                <div className="grid gap-4">
-                    {bookings.map(booking => (
-                        <div key={booking.id} className="bg-white p-6 rounded-[2rem] border border-slate-100 flex justify-between items-center">
-                            <div>
-                                <p className="font-black text-slate-800 capitalize">{booking.service_type}</p>
-                                <p className="text-sm text-slate-400">{booking.preferred_date} • {booking.preferred_time}</p>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {mockWorkers.map((worker, idx) => (
+                        <motion.div 
+                            key={worker.id}
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: idx * 0.1 }}
+                            className="bg-white p-6 rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-xl transition-all group"
+                        >
+                            <div className="flex items-center gap-4 mb-4">
+                                <div className="relative">
+                                    <img src={worker.image} alt={worker.name} className="w-16 h-16 rounded-2xl object-cover" />
+                                    <div className="absolute -bottom-1 -right-1 bg-emerald-500 w-5 h-5 rounded-full border-4 border-white"></div>
+                                </div>
+                                <div className="flex-1">
+                                    <h4 className="font-black text-slate-800 text-lg leading-tight">{worker.name}</h4>
+                                    <p className="text-indigo-600 font-bold text-sm">{worker.specialty}</p>
+                                </div>
                             </div>
-                            <StatusBadge status={booking.status} />
-                        </div>
+                            <div className="flex justify-between items-center py-4 border-t border-slate-50">
+                                <div className="text-center">
+                                    <p className="text-xs text-slate-400 font-bold uppercase tracking-wider">Rating</p>
+                                    <p className="text-slate-800 font-black flex items-center gap-1">
+                                        <Star size={14} className="text-amber-500 fill-amber-500" /> {worker.rating}
+                                    </p>
+                                </div>
+                                <div className="text-center">
+                                    <p className="text-xs text-slate-400 font-bold uppercase tracking-wider">Jobs</p>
+                                    <p className="text-slate-800 font-black">{worker.completed}+</p>
+                                </div>
+                                <div className="text-center">
+                                    <p className="text-xs text-slate-400 font-bold uppercase tracking-wider">Fee</p>
+                                    <p className="text-indigo-600 font-black">₹{worker.price}</p>
+                                </div>
+                            </div>
+                            <button 
+                                onClick={() => navigate('/book')}
+                                className="w-full mt-4 bg-slate-50 group-hover:bg-indigo-600 group-hover:text-white text-slate-600 py-4 rounded-2xl font-black text-sm transition-all flex items-center justify-center gap-2"
+                            >
+                                <Briefcase size={18} /> Hire Now
+                            </button>
+                        </motion.div>
                     ))}
                 </div>
-            )}
+            </div>
+
+            {/* Active Bookings Section */}
+            <div className="space-y-6 pt-8">
+                <div className="flex justify-between items-center px-4">
+                    <h3 className="text-xl font-bold text-slate-800 flex items-center gap-2">
+                        <Activity className="text-indigo-500" size={20} />
+                        Active & Past Requests
+                    </h3>
+                </div>
+                
+                {bookings.length === 0 ? (
+                    <div className="bg-gradient-to-br from-indigo-50 to-white p-12 rounded-[3.5rem] border border-dashed border-indigo-200 text-center space-y-4">
+                        <div className="w-20 h-20 bg-white rounded-3xl flex items-center justify-center mx-auto shadow-indigo-100 shadow-xl border border-indigo-50">
+                            <Sparkles size={40} className="text-indigo-400" />
+                        </div>
+                        <div>
+                            <h4 className="text-2xl font-black text-slate-800">No active bookings</h4>
+                            <p className="text-slate-500 max-w-sm mx-auto mt-2">Hire a professional to fast-track your reports or book a service for your locality.</p>
+                        </div>
+                        <div className="pt-4 flex flex-col sm:flex-row justify-center gap-4">
+                            <button onClick={() => navigate('/analyze')} className="bg-black text-white px-8 py-4 rounded-[2rem] font-black transition-transform hover:scale-105 active:scale-95 shadow-lg">
+                                Report New Issue
+                            </button>
+                            <button onClick={() => setActiveTab('reports')} className="bg-white border-2 border-slate-100 text-slate-600 px-8 py-4 rounded-[2rem] font-black hover:bg-slate-50 transition-all">
+                                My Reports
+                            </button>
+                        </div>
+                    </div>
+                ) : (
+                    <div className="grid gap-4">
+                        {bookings.map(booking => (
+                            <motion.div 
+                                key={booking.id}
+                                layout
+                                className="bg-white p-8 rounded-[3rem] border border-slate-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-8 shadow-sm hover:shadow-xl transition-all duration-300 group relative overflow-hidden"
+                            >
+                                <div className="absolute top-0 left-0 w-2 h-full bg-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                
+                                <div className="flex items-center gap-6">
+                                    <div className={cn(
+                                        "w-16 h-16 rounded-[1.5rem] flex items-center justify-center shadow-xl transition-transform group-hover:scale-110",
+                                        booking.status === 'completed' ? "bg-emerald-50 text-emerald-600" : "bg-indigo-50 text-indigo-600"
+                                    )}>
+                                        <Briefcase size={32} />
+                                    </div>
+                                    <div>
+                                        <div className="flex items-center gap-3">
+                                            <p className="font-black text-slate-800 text-xl tracking-tight capitalize">
+                                                {booking.service_type} • {booking.report_title || 'City Service'}
+                                            </p>
+                                            <div className="flex items-center gap-1.5 px-3 py-1 bg-slate-100 rounded-full border border-slate-200">
+                                                <span className="w-1.5 h-1.5 rounded-full bg-slate-400" />
+                                                <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">#BK-{booking.id.slice(0, 4)}</span>
+                                            </div>
+                                        </div>
+                                        <div className="flex flex-wrap items-center gap-4 mt-2">
+                                            <p className="text-sm text-slate-400 font-bold flex items-center gap-2">
+                                                <Calendar size={14} className="text-indigo-400" /> {booking.preferred_date || 'Service Scheduled'}
+                                            </p>
+                                            <p className="text-sm text-slate-400 font-bold flex items-center gap-2">
+                                                <Clock size={14} className="text-indigo-400" /> {booking.preferred_time || booking.time_slot || 'Express Delivery'}
+                                            </p>
+                                            {booking.worker_name && (
+                                                <p className="text-sm text-indigo-600 font-black flex items-center gap-2 bg-indigo-50 px-3 py-1 rounded-full">
+                                                    <User size={14} /> Assigned: {booking.worker_name}
+                                                </p>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-6 w-full md:w-auto mt-6 md:mt-0 pt-6 md:pt-0 border-t md:border-t-0 border-slate-50">
+                                    <div className="flex-1 md:text-right">
+                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Service Status</p>
+                                        <StatusBadge status={booking.status} />
+                                    </div>
+                                    <button className="w-14 h-14 bg-slate-50 rounded-2xl text-slate-300 group-hover:bg-indigo-600 group-hover:text-white group-hover:shadow-lg group-hover:shadow-indigo-200 transition-all flex items-center justify-center">
+                                        <ChevronRight size={28} />
+                                    </button>
+                                </div>
+                            </motion.div>
+                        ))}
+                    </div>
+                )}
+            </div>
         </div>
     );
 
@@ -1293,6 +1445,84 @@ const CivilianDashboard = ({ user }) => {
                     "Sign out"
                 ]}
             />
+
+            {/* Modern Hire Professional Modal */}
+            <AnimatePresence>
+                {hiringModal.show && (
+                    <motion.div 
+                        initial={{ opacity: 0 }} 
+                        animate={{ opacity: 1 }} 
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md"
+                    >
+                        <motion.div 
+                            initial={{ scale: 0.9, y: 20 }} 
+                            animate={{ scale: 1, y: 0 }} 
+                            exit={{ scale: 0.9, y: 20 }}
+                            className="bg-white w-full max-w-lg rounded-[3rem] shadow-2xl overflow-hidden border border-slate-100"
+                        >
+                            <div className="relative h-32 bg-gradient-to-r from-indigo-600 to-violet-700 p-8">
+                                <button 
+                                    onClick={() => setHiringModal({ show: false, reportId: null, worker: null })}
+                                    className="absolute top-6 right-6 text-white/50 hover:text-white transition-colors"
+                                >
+                                    <X size={24} />
+                                </button>
+                                <h3 className="text-2xl font-black text-white">Hire Professional</h3>
+                                <p className="text-indigo-100 text-sm font-medium">Fast-track resolution for your report</p>
+                            </div>
+                            
+                            <div className="p-8 space-y-6">
+                                <div className="flex items-center gap-6 p-4 bg-slate-50 rounded-3xl border border-slate-100">
+                                    <img src={hiringModal.worker?.image} className="w-20 h-20 rounded-2xl object-cover shadow-lg" alt="" />
+                                    <div>
+                                        <h4 className="text-xl font-black text-slate-800">{hiringModal.worker?.name}</h4>
+                                        <p className="text-indigo-600 font-bold">{hiringModal.worker?.specialty}</p>
+                                        <div className="flex items-center gap-2 mt-1">
+                                            <Star size={14} className="text-amber-500 fill-amber-500" />
+                                            <span className="text-sm font-black text-slate-600">{hiringModal.worker?.rating}</span>
+                                            <span className="text-xs text-slate-400 font-bold">• {hiringModal.worker?.completed} Jobs</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="space-y-4">
+                                    <div className="flex justify-between items-center text-sm font-bold text-slate-400 uppercase tracking-widest px-2">
+                                        <span>Service Estimate</span>
+                                        <span>Price</span>
+                                    </div>
+                                    <div className="bg-slate-900 text-white p-6 rounded-3xl flex justify-between items-center shadow-xl shadow-indigo-100 italic">
+                                        <div className="flex items-center gap-3">
+                                            <Zap size={24} className="text-amber-400" />
+                                            <div>
+                                                <p className="text-sm font-bold">Priority Resolution</p>
+                                                <p className="text-xs text-slate-400">Fixed within 2-4 hours</p>
+                                            </div>
+                                        </div>
+                                        <span className="text-2xl font-black text-amber-400">₹{hiringModal.worker?.price}</span>
+                                    </div>
+                                </div>
+
+                                <div className="flex gap-4 pt-2">
+                                    <button 
+                                        onClick={() => setHiringModal({ show: false, reportId: null, worker: null })}
+                                        className="flex-1 px-6 py-4 rounded-2xl font-black text-slate-500 hover:bg-slate-50 transition-all border-2 border-slate-50"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button 
+                                        onClick={confirmHire}
+                                        disabled={hiringModal.loading}
+                                        className="flex-[3] bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-4 rounded-[2rem] font-black shadow-xl shadow-indigo-100 disabled:opacity-50 flex items-center justify-center gap-2 grow"
+                                    >
+                                        {hiringModal.loading ? <Loader2 className="animate-spin" /> : <><CheckCircle size={20} /> <span>Confirm Hire</span></>}
+                                    </button>
+                                </div>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 };

@@ -1407,7 +1407,39 @@ class JobResource(Resource):
     @gig_ns.doc(security='apikey')
     @jwt_required()
     def post(self):
-        pass
+        """Post a job for a report"""
+        current_user_id = get_jwt_identity()
+        data = request.json
+        report_id = data.get('report_id')
+        service_type = data.get('service_type', 'gig') # gig, municipal, ngo
+        
+        report = Report.query.filter_by(id=report_id).first()
+        if not report:
+            return {'message': 'Report not found'}, 404
+            
+        if Job.query.filter_by(report_id=report_id).first():
+            return {'message': 'Job already exists for this report'}, 400
+            
+        new_job = Job(
+            report_id=report_id,
+            service_type=service_type,
+            status='posted',
+            quoted_price=300.0 if service_type == 'gig' else 0.0 # Example pricing
+        )
+        
+        # Update report status
+        report.status = 'assigned'
+        db.session.add(ReportLog(
+            report_id=report.id,
+            status='assigned',
+            message=f'Gig worker requested via {service_type} service',
+            updated_by=current_user_id
+        ))
+        
+        db.session.add(new_job)
+        db.session.commit()
+        
+        return {'success': True, 'message': 'Job posted successfully', 'job': new_job.to_dict()}, 201
 
 
 # =====================
@@ -1578,28 +1610,6 @@ class GovStaff(Resource):
         except Exception as e:
             db.session.rollback()
             return {'message': f'Failed to create user: {str(e)}'}, 500
-        data = request.json
-        report_id = data.get('report_id')
-        service_type = data.get('service_type', 'gig') # gig, municipal, ngo
-        
-        report = Report.query.filter_by(id=report_id).first()
-        if not report:
-            return {'message': 'Report not found'}, 404
-            
-        if Job.query.filter_by(report_id=report_id).first():
-            return {'message': 'Job already exists for this report'}, 400
-            
-        new_job = Job(
-            report_id=report_id,
-            service_type=service_type,
-            status='posted',
-            quoted_price=300.0 if service_type == 'gig' else 0.0 # Example pricing
-        )
-        
-        db.session.add(new_job)
-        db.session.commit()
-        
-        return {'success': True, 'message': 'Job posted successfully', 'job': new_job.to_dict()}, 201
 
 @gig_ns.route('/jobs/<string:job_id>/accept')
 class JobAccept(Resource):
@@ -1677,14 +1687,17 @@ class JobRate(Resource):
             
         worker = Worker.query.filter_by(id=job.worker_id).first()
         if worker:
-            # Simple average update
-            # In real app, store individual ratings in a Rating table
-            # worker.rating = (worker.rating + rating) / 2 
-            # Better: weighted average or list of ratings. keeping it simple:
-            worker.rating = (worker.rating * 10 + rating) / 11 # approximate rolling avg
+            job.rating = rating
+            # Update worker avg rating logic
+            if worker.ratings_count:
+                worker.rating = (worker.rating * worker.ratings_count + rating) / (worker.ratings_count + 1)
+                worker.ratings_count += 1
+            else:
+                worker.rating = rating
+                worker.ratings_count = 1
             db.session.commit()
             
-        return {'success': True, 'message': 'Worker rated', 'new_rating': worker.rating}, 200
+        return {'success': True, 'message': 'Worker rated successfully'}, 200
 
 # =====================
 # BOOKING ENDPOINTS (Urban Company Style)
@@ -1732,6 +1745,19 @@ class BookingsList(Resource):
             eta_minutes=random.randint(20, 60) if service_type == 'express' else random.randint(10, 30)
         )
         
+        # Update associated report
+        report_id = data.get('report_id')
+        if report_id:
+            report = Report.query.get(report_id)
+            if report:
+                report.status = 'assigned'
+                db.session.add(ReportLog(
+                    report_id=report.id,
+                    status='assigned',
+                    message=f'Premium professional requested via {service_type} booking. Assigned: {assigned_worker["name"]}',
+                    updated_by=current_user_id
+                ))
+        
         db.session.add(booking)
         db.session.commit()
         
@@ -1747,9 +1773,18 @@ class BookingsList(Resource):
         """Get current user's bookings"""
         current_user_id = get_jwt_identity()
         bookings = Booking.query.filter_by(user_id=current_user_id).order_by(Booking.created_at.desc()).all()
+        results = []
+        for b in bookings:
+            d = b.to_dict()
+            report = Report.query.get(b.report_id)
+            if report:
+                d['report_title'] = report.category.replace('_', ' ').title()
+                d['report_status'] = report.status
+            results.append(d)
+                
         return {
             'success': True,
-            'bookings': [b.to_dict() for b in bookings]
+            'bookings': results
         }, 200
 
 @bookings_ns.route('/<string:booking_id>')
