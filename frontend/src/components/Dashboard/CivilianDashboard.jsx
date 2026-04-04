@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
-import { 
+import {
     MapPin, Calendar, CheckCircle, Zap, ArrowRight, TrendingUp,
     LayoutDashboard, FileText, Shield, LogOut, RefreshCw, X,
     Edit2, ExternalLink, BarChart3, Activity, PieChart as PieIcon, Map, Map as MapIcon,
@@ -59,7 +59,7 @@ const CivilianDashboard = ({ user }) => {
     const [claimedRewards, setClaimedRewards] = useState([]);
     const [showPassport, setShowPassport] = useState(false);
     const [hiringModal, setHiringModal] = useState({ show: false, reportId: null, worker: null });
-    
+
     // Mock workers for Marketplace demo
     const mockWorkers = [
         { id: 1, name: 'Rahul Sharma', specialty: 'Pothole Specialist', rating: 4.9, completed: 124, price: 299, image: 'https://randomuser.me/api/portraits/men/32.jpg' },
@@ -94,12 +94,12 @@ const CivilianDashboard = ({ user }) => {
         leaderboard.forEach(user => {
             const city = user.city || 'Global';
             if (!cityStats[city]) {
-                cityStats[city] = { 
-                    name: `${city}, UrbanEye`, 
+                cityStats[city] = {
+                    name: `${city}, UrbanEye`,
                     efficiency: 85 + Math.floor(Math.random() * 10), // Base efficiency + random
-                    resolved: 0, 
-                    city: city, 
-                    totalXP: 0 
+                    resolved: 0,
+                    city: city,
+                    totalXP: 0
                 };
             }
             cityStats[city].resolved += (user.report_count || 0);
@@ -222,12 +222,12 @@ const CivilianDashboard = ({ user }) => {
         setHiringModal({ ...hiringModal, loading: true });
         try {
             // Updated to call the unified bookings endpoint which handles Job creation on backend
-            await axios.post(`${API_BASE}/bookings`, { 
-                report_id: reportId, 
+            await axios.post(`${API_BASE}/bookings`, {
+                report_id: reportId,
                 service_type: serviceType,
-                time_slot: 'today_morning' 
+                time_slot: 'today_morning'
             }, getAuthHeaders());
-            
+
             setHiringModal({ show: false, reportId: null, worker: null });
             fetchMyReports(); // Refresh to see "assigned" status
             fetchMyBookings(); // Refresh to see the new booking
@@ -333,7 +333,7 @@ const CivilianDashboard = ({ user }) => {
                     <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_-20%,rgba(255,255,255,0.2),transparent)]" />
                     <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:10px_10px]" />
                 </div>
-                
+
                 <div className="relative z-10 px-8 pt-16 pb-10">
                     <div className="flex justify-between items-start mb-6">
                         <div className="flex items-center gap-2">
@@ -383,9 +383,9 @@ const CivilianDashboard = ({ user }) => {
                             <span className="text-[8px] font-black uppercase text-slate-400">Card Verified • ID: 0X84AE...</span>
                         </div>
                         <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                            <motion.div 
+                            <motion.div
                                 initial={{ width: 0 }} animate={{ width: '65%' }}
-                                className="h-full bg-indigo-600 shadow-lg shadow-indigo-200" 
+                                className="h-full bg-indigo-600 shadow-lg shadow-indigo-200"
                             />
                         </div>
                     </div>
@@ -476,7 +476,7 @@ const CivilianDashboard = ({ user }) => {
 
     const RequestNGOHelpModal = () => {
         if (!showNGOModal) return null;
-        
+
         const categories = [
             { id: 'sanitation', name: 'Sanitation', icon: '🧹', desc: 'Clean-up drives, waste management' },
             { id: 'environment', name: 'Environment', icon: '🌿', desc: 'Tree planting, pollution control' },
@@ -487,7 +487,7 @@ const CivilianDashboard = ({ user }) => {
 
         return (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-slate-900/40 backdrop-blur-md">
-                <motion.div 
+                <motion.div
                     initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }}
                     className="bg-white rounded-[3rem] w-full max-w-2xl overflow-hidden shadow-2xl relative border border-white/20"
                 >
@@ -496,10 +496,10 @@ const CivilianDashboard = ({ user }) => {
                             <X size={24} />
                         </button>
                         <div className="flex items-center gap-4 mb-2">
-                             <div className="p-3 bg-white/10 rounded-2xl backdrop-blur-md">
+                            <div className="p-3 bg-white/10 rounded-2xl backdrop-blur-md">
                                 <Users size={24} />
-                             </div>
-                             <h2 className="text-3xl font-black tracking-tight">NGO Assistance</h2>
+                            </div>
+                            <h2 className="text-3xl font-black tracking-tight">NGO Assistance</h2>
                         </div>
                         <p className="text-indigo-100 font-medium">Free, community-driven support for local issues</p>
                     </div>
@@ -515,9 +515,9 @@ const CivilianDashboard = ({ user }) => {
                                         onClick={() => setNgoForm({ ...ngoForm, category: cat.id })}
                                         className={cn(
                                             "flex items-center gap-4 p-4 rounded-2xl border-2 transition-all text-left",
-                                            ngoForm.category === cat.id 
-                                            ? "border-indigo-600 bg-indigo-50/50 shadow-sm" 
-                                            : "border-slate-100 hover:border-slate-200"
+                                            ngoForm.category === cat.id
+                                                ? "border-indigo-600 bg-indigo-50/50 shadow-sm"
+                                                : "border-slate-100 hover:border-slate-200"
                                         )}
                                     >
                                         <span className="text-2xl">{cat.icon}</span>
@@ -532,7 +532,7 @@ const CivilianDashboard = ({ user }) => {
 
                         <div>
                             <label className="text-sm font-black text-slate-400 tracking-widest uppercase mb-3 block">Describe the Concern</label>
-                            <textarea 
+                            <textarea
                                 required
                                 value={ngoForm.description}
                                 onChange={(e) => setNgoForm({ ...ngoForm, description: e.target.value })}
@@ -544,7 +544,7 @@ const CivilianDashboard = ({ user }) => {
                         <div className="grid md:grid-cols-2 gap-6">
                             <div>
                                 <label className="text-sm font-black text-slate-400 tracking-widest uppercase mb-3 block">Scale of Issue</label>
-                                <select 
+                                <select
                                     value={ngoForm.scale}
                                     onChange={(e) => setNgoForm({ ...ngoForm, scale: e.target.value })}
                                     className="w-full bg-slate-50 border-none rounded-2xl p-4 text-slate-700 font-bold focus:ring-2 ring-indigo-500"
@@ -558,7 +558,7 @@ const CivilianDashboard = ({ user }) => {
                                 <label className="text-sm font-black text-slate-400 tracking-widest uppercase mb-3 block">Location / Address</label>
                                 <div className="relative">
                                     <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                                    <input 
+                                    <input
                                         required
                                         type="text"
                                         value={ngoForm.address}
@@ -571,14 +571,14 @@ const CivilianDashboard = ({ user }) => {
                         </div>
 
                         <div className="pt-4 flex gap-4">
-                            <button 
+                            <button
                                 type="button"
                                 onClick={() => setShowNGOModal(false)}
                                 className="flex-1 py-5 rounded-2xl font-black text-slate-400 hover:bg-slate-50 transition-all"
                             >
                                 Cancel
                             </button>
-                            <button 
+                            <button
                                 type="submit"
                                 className="flex-[2] bg-slate-900 text-white py-5 rounded-2xl font-black shadow-xl hover:shadow-slate-200 transition-all transform hover:-translate-y-1 active:translate-y-0 flex items-center justify-center gap-3"
                             >
@@ -708,7 +708,7 @@ const CivilianDashboard = ({ user }) => {
                                     <p className="text-slate-500 mt-2 max-w-sm mx-auto font-medium">You haven't reported any issues yet. Be the first responder in your neighborhood.</p>
                                 </div>
                                 <button onClick={() => navigate('/analyze')} className="group bg-indigo-600 hover:bg-slate-900 text-white px-10 py-5 rounded-[2rem] font-black transition-all transform hover:scale-105 active:scale-95 shadow-xl shadow-indigo-200 flex items-center gap-3 mx-auto">
-                                    <Plus size={24} /> 
+                                    <Plus size={24} />
                                     <span>Start First Report</span>
                                     <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
                                 </button>
@@ -766,13 +766,13 @@ const CivilianDashboard = ({ user }) => {
                         <MapContainer center={[22.7196, 75.8577]} zoom={13} style={{ height: '100%', width: '100%' }} className="z-0">
                             <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' />
                             {predictions.map((pred) => (
-                                <CircleMarker 
-                                    key={pred.id} 
-                                    center={[pred.lat, pred.lng]} 
-                                    radius={25} 
-                                    pathOptions={{ 
-                                        fillColor: pred.risk.includes('High') ? '#ef4444' : '#6366f1', 
-                                        color: 'white', weight: 4, fillOpacity: 0.4 
+                                <CircleMarker
+                                    key={pred.id}
+                                    center={[pred.lat, pred.lng]}
+                                    radius={25}
+                                    pathOptions={{
+                                        fillColor: pred.risk.includes('High') ? '#ef4444' : '#6366f1',
+                                        color: 'white', weight: 4, fillOpacity: 0.4
                                     }}
                                 >
                                     <Popup className="custom-popup">
@@ -803,7 +803,7 @@ const CivilianDashboard = ({ user }) => {
                         <h4 className="text-xs font-black uppercase tracking-[0.2em] text-slate-400 mb-2 px-2">Prediction Feed</h4>
                         <div className="space-y-4 max-h-[550px] overflow-y-auto pr-2 custom-scrollbar">
                             {predictions.map((pred) => (
-                                <motion.div 
+                                <motion.div
                                     key={pred.id}
                                     whileHover={{ x: 10 }}
                                     className="p-6 bg-white rounded-[2rem] border border-slate-100 shadow-lg hover:shadow-xl transition-all cursor-pointer group"
@@ -821,7 +821,7 @@ const CivilianDashboard = ({ user }) => {
                                         <div className="text-indigo-600 font-black text-lg">{pred.impact}</div>
                                     </div>
                                     <p className="text-xs text-slate-500 font-bold mb-4 line-clamp-2 leading-relaxed italic opacity-80 group-hover:opacity-100 italic transition-opacity">"{pred.reasoning}"</p>
-                                    <button 
+                                    <button
                                         onClick={() => navigate('/analyze')}
                                         className="w-full bg-slate-900 text-white py-3 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-black transition-colors"
                                     >
@@ -846,7 +846,7 @@ const CivilianDashboard = ({ user }) => {
                 {/* Header & Filters */}
                 <div className="bg-white rounded-[3rem] p-10 border border-slate-100 shadow-2xl overflow-hidden relative">
                     <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-50 rounded-full blur-[120px] -mr-48 -mt-48 opacity-60 animate-pulse" />
-                    
+
                     <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-8">
                         <div className="flex items-center gap-8">
                             <div className="w-20 h-20 bg-gradient-to-br from-amber-50 to-orange-100 text-amber-500 rounded-3xl flex items-center justify-center shadow-xl border border-amber-200/50">
@@ -861,13 +861,13 @@ const CivilianDashboard = ({ user }) => {
                         <div className="flex flex-wrap items-center gap-4 bg-slate-50 p-2 rounded-[2rem] border border-slate-100">
                             {/* Type Toggle */}
                             <div className="bg-white p-1.5 rounded-2xl flex shadow-sm">
-                                <button 
+                                <button
                                     onClick={() => setLeaderboardType('citizens')}
                                     className={cn("px-8 py-3 rounded-xl text-sm font-black transition-all flex items-center gap-2", leaderboardType === 'citizens' ? "bg-indigo-600 text-white shadow-lg" : "text-slate-400 hover:bg-slate-50")}
                                 >
                                     <Users size={18} /> Citizens
                                 </button>
-                                <button 
+                                <button
                                     onClick={() => setLeaderboardType('municipalities')}
                                     className={cn("px-8 py-3 rounded-xl text-sm font-black transition-all flex items-center gap-2", leaderboardType === 'municipalities' ? "bg-indigo-600 text-white shadow-lg" : "text-slate-400 hover:bg-slate-50")}
                                 >
@@ -878,7 +878,7 @@ const CivilianDashboard = ({ user }) => {
                             {/* City Filter */}
                             <div className="relative">
                                 <Filter size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
-                                <select 
+                                <select
                                     value={leaderboardFilter}
                                     onChange={(e) => setLeaderboardFilter(e.target.value)}
                                     className="pl-12 pr-10 py-3.5 bg-white border border-slate-100 rounded-2xl text-sm font-black text-slate-700 appearance-none focus:ring-4 focus:ring-indigo-500/10 transition-all cursor-pointer shadow-sm"
@@ -894,7 +894,7 @@ const CivilianDashboard = ({ user }) => {
                 {leaderboardType === 'citizens' ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {filteredCitizens.slice(0, 3).map((entry, i) => (
-                            <motion.div 
+                            <motion.div
                                 key={entry.user_id}
                                 initial={{ y: 30, opacity: 0 }}
                                 animate={{ y: 0, opacity: 1 }}
@@ -902,7 +902,7 @@ const CivilianDashboard = ({ user }) => {
                                 className={cn(
                                     "p-10 rounded-[3.5rem] relative overflow-hidden group border-2 transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl",
                                     i === 0 ? "bg-gradient-to-br from-amber-400 via-orange-500 to-amber-600 text-white border-amber-300 shadow-amber-200/50" :
-                                    i === 1 ? "bg-white border-slate-200 shadow-slate-100" : "bg-white border-orange-100 shadow-orange-50"
+                                        i === 1 ? "bg-white border-slate-200 shadow-slate-100" : "bg-white border-orange-100 shadow-orange-50"
                                 )}
                             >
                                 <div className="absolute top-6 right-8 text-8xl font-black opacity-10 group-hover:scale-110 group-hover:opacity-20 transition-all duration-700">{i + 1}</div>
@@ -919,7 +919,7 @@ const CivilianDashboard = ({ user }) => {
                                     <div className={cn("px-8 py-3 rounded-2xl font-black text-2xl shadow-inner", i === 0 ? "bg-white/20" : "bg-indigo-50 text-indigo-600")}>
                                         {entry.xp} <span className="text-sm opacity-60">XP</span>
                                     </div>
-                                    
+
                                     <div className="flex gap-4 mt-8 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
                                         <div className="text-center">
                                             <p className="text-[10px] font-black uppercase tracking-tighter opacity-70">Impact</p>
@@ -938,7 +938,7 @@ const CivilianDashboard = ({ user }) => {
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {filteredMunicipalities.slice(0, 3).map((m, i) => (
-                            <motion.div 
+                            <motion.div
                                 key={m.name}
                                 initial={{ y: 30, opacity: 0 }}
                                 animate={{ y: 0, opacity: 1 }}
@@ -946,7 +946,7 @@ const CivilianDashboard = ({ user }) => {
                                 className={cn(
                                     "p-10 rounded-[3.5rem] relative overflow-hidden group border-2 transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl",
                                     i === 0 ? "bg-gradient-to-br from-emerald-400 via-green-600 to-emerald-700 text-white border-emerald-300 shadow-emerald-200/50" :
-                                    i === 1 ? "bg-white border-slate-200 shadow-slate-100" : "bg-white border-blue-100 shadow-blue-50"
+                                        i === 1 ? "bg-white border-slate-200 shadow-slate-100" : "bg-white border-blue-100 shadow-blue-50"
                                 )}
                             >
                                 <div className="absolute top-6 right-8 text-8xl font-black opacity-10">{i + 1}</div>
@@ -988,8 +988,8 @@ const CivilianDashboard = ({ user }) => {
                                     <p className="text-slate-400 font-bold italic text-lg">Region boundaries reached. More contributors needed!</p>
                                 </div>
                             ) : filteredCitizens.slice(3).map((entry, i) => (
-                                <motion.div 
-                                    key={entry.user_id} 
+                                <motion.div
+                                    key={entry.user_id}
                                     initial={{ opacity: 0, x: -20 }}
                                     animate={{ opacity: 1, x: 0 }}
                                     transition={{ delay: i * 0.05 }}
@@ -1019,8 +1019,8 @@ const CivilianDashboard = ({ user }) => {
                                     <p className="text-slate-400 font-bold italic text-lg">Council list synchronized.</p>
                                 </div>
                             ) : filteredMunicipalities.slice(3).map((m, i) => (
-                                <motion.div 
-                                    key={m.name} 
+                                <motion.div
+                                    key={m.name}
                                     initial={{ opacity: 0, x: -20 }}
                                     animate={{ opacity: 1, x: 0 }}
                                     className="flex items-center gap-6 p-6 rounded-[2.5rem] bg-slate-50/50 hover:bg-white hover:shadow-xl transition-all group border border-transparent hover:border-slate-100"
@@ -1056,9 +1056,9 @@ const CivilianDashboard = ({ user }) => {
                     <h2 className="text-4xl font-black text-slate-800 tracking-tight">Gig Services</h2>
                     <p className="text-slate-500 mt-2 font-medium">Connect with verified professionals to resolve city issues fast.</p>
                 </div>
-                <button onClick={() => navigate('/book')} 
+                <button onClick={() => navigate('/book')}
                     className="group bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-4 rounded-[2rem] font-black flex items-center gap-3 transition-all transform hover:scale-105 shadow-xl shadow-indigo-200">
-                    <Plus size={24} /> 
+                    <Plus size={24} />
                     <span>New Booking</span>
                     <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
                 </button>
@@ -1075,7 +1075,7 @@ const CivilianDashboard = ({ user }) => {
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {mockWorkers.map((worker, idx) => (
-                        <motion.div 
+                        <motion.div
                             key={worker.id}
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
@@ -1108,7 +1108,7 @@ const CivilianDashboard = ({ user }) => {
                                     <p className="text-indigo-600 font-black">₹{worker.price}</p>
                                 </div>
                             </div>
-                            <button 
+                            <button
                                 onClick={() => navigate('/book')}
                                 className="w-full mt-4 bg-slate-50 group-hover:bg-indigo-600 group-hover:text-white text-slate-600 py-4 rounded-2xl font-black text-sm transition-all flex items-center justify-center gap-2"
                             >
@@ -1127,7 +1127,7 @@ const CivilianDashboard = ({ user }) => {
                         Active & Past Requests
                     </h3>
                 </div>
-                
+
                 {bookings.length === 0 ? (
                     <div className="bg-gradient-to-br from-indigo-50 to-white p-12 rounded-[3.5rem] border border-dashed border-indigo-200 text-center space-y-4">
                         <div className="w-20 h-20 bg-white rounded-3xl flex items-center justify-center mx-auto shadow-indigo-100 shadow-xl border border-indigo-50">
@@ -1149,13 +1149,13 @@ const CivilianDashboard = ({ user }) => {
                 ) : (
                     <div className="grid gap-4">
                         {bookings.map(booking => (
-                            <motion.div 
+                            <motion.div
                                 key={booking.id}
                                 layout
                                 className="bg-white p-8 rounded-[3rem] border border-slate-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-8 shadow-sm hover:shadow-xl transition-all duration-300 group relative overflow-hidden"
                             >
                                 <div className="absolute top-0 left-0 w-2 h-full bg-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity" />
-                                
+
                                 <div className="flex items-center gap-6">
                                     <div className={cn(
                                         "w-16 h-16 rounded-[1.5rem] flex items-center justify-center shadow-xl transition-transform group-hover:scale-110",
@@ -1208,7 +1208,7 @@ const CivilianDashboard = ({ user }) => {
     // ========== NGO HELP SECTION ==========
     const NGOHelpSection = () => {
         const getCatIcon = (cat) => {
-            switch(cat) {
+            switch (cat) {
                 case 'sanitation': return '🧹';
                 case 'environment': return '🌿';
                 case 'animal_welfare': return '🐕';
@@ -1219,7 +1219,7 @@ const CivilianDashboard = ({ user }) => {
         };
 
         const getStatusColor = (status) => {
-            switch(status) {
+            switch (status) {
                 case 'submitted': return 'bg-blue-100 text-blue-600';
                 case 'reviewing': return 'bg-amber-100 text-amber-600';
                 case 'assigned': return 'bg-indigo-100 text-indigo-600';
@@ -1240,7 +1240,7 @@ const CivilianDashboard = ({ user }) => {
                             <p className="text-slate-500 font-medium">Free assistance from verified social partners</p>
                         </div>
                     </div>
-                    <button 
+                    <button
                         onClick={() => setShowNGOModal(true)}
                         className="bg-slate-900 text-white px-8 py-4 rounded-2xl font-black flex items-center gap-3 hover:bg-rose-600 transition-all shadow-lg hover:shadow-rose-100"
                     >
@@ -1257,7 +1257,7 @@ const CivilianDashboard = ({ user }) => {
                 ) : (
                     <div className="grid md:grid-cols-2 gap-6">
                         {ngoRequests.map((req, idx) => (
-                            <motion.div 
+                            <motion.div
                                 key={idx}
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
@@ -1307,7 +1307,7 @@ const CivilianDashboard = ({ user }) => {
                 <div className="absolute bottom-0 left-0 w-80 h-80 bg-amber-50 rounded-full blur-[100px] -ml-40 -mb-40 opacity-40" />
 
                 <div className="relative z-10 flex flex-col lg:flex-row items-center gap-16">
-                    <motion.div 
+                    <motion.div
                         whileHover={{ rotateY: 15, scale: 1.05 }}
                         className="w-56 h-56 bg-gradient-to-br from-indigo-600 via-purple-600 to-indigo-800 rounded-[4rem] shadow-[0_20px_50px_rgba(79,70,229,0.4)] flex flex-col items-center justify-center text-white shrink-0 relative overflow-hidden group cursor-pointer"
                         onClick={() => setShowPassport(true)}
@@ -1346,9 +1346,9 @@ const CivilianDashboard = ({ user }) => {
                                 </div>
                             </div>
                             <div className="w-full bg-slate-100 h-8 rounded-3xl overflow-hidden shadow-inner border border-slate-50 relative group">
-                                <motion.div 
-                                    initial={{ width: 0 }} 
-                                    animate={{ width: `${Math.min((stats.impact / 1500) * 100, 100)}%` }} 
+                                <motion.div
+                                    initial={{ width: 0 }}
+                                    animate={{ width: `${Math.min((stats.impact / 1500) * 100, 100)}%` }}
                                     className="bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 h-full rounded-3xl relative shadow-lg shadow-indigo-500/20"
                                 >
                                     <div className="absolute inset-0 bg-[linear-gradient(45deg,rgba(255,255,255,.2)_25%,transparent_25%,transparent_50%,rgba(255,255,255,.2)_50%,rgba(255,255,255,.2)_75%,transparent_75%,transparent)] bg-[length:24px_24px] opacity-20 animate-[move_1s_linear_infinite]" />
@@ -1362,7 +1362,7 @@ const CivilianDashboard = ({ user }) => {
             {/* Sub-Tabs (New) */}
             <div className="flex gap-8 border-b border-slate-100 pb-2">
                 {['available', 'claimed', 'achievements'].map(tab => (
-                    <button 
+                    <button
                         key={tab}
                         onClick={() => setRewardTab(tab)}
                         className={cn(
@@ -1379,7 +1379,7 @@ const CivilianDashboard = ({ user }) => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
                 {rewardTab === 'available' ? (
                     rewards.map((reward, i) => (
-                        <motion.div 
+                        <motion.div
                             key={reward.id}
                             initial={{ y: 30, opacity: 0 }}
                             animate={{ y: 0, opacity: 1 }}
@@ -1412,15 +1412,15 @@ const CivilianDashboard = ({ user }) => {
                                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Redeem for</p>
                                     <p className="text-3xl font-black text-slate-900 tabular-nums">{reward.cost} <span className="text-sm opacity-40">XP</span></p>
                                 </div>
-                                <button 
+                                <button
                                     onClick={() => handleClaimReward(reward)}
                                     disabled={stats.impact < reward.cost || claimedRewards.some(cr => cr.id === reward.id)}
                                     className={cn(
                                         "px-10 py-5 rounded-[2rem] font-black transition-all shadow-2xl active:scale-95 text-lg",
                                         claimedRewards.some(cr => cr.id === reward.id)
                                             ? "bg-emerald-50 text-emerald-600 cursor-not-allowed shadow-none border border-emerald-100"
-                                            : stats.impact >= reward.cost 
-                                                ? "bg-indigo-600 text-white hover:bg-indigo-700 shadow-indigo-500/40 hover:px-12" 
+                                            : stats.impact >= reward.cost
+                                                ? "bg-indigo-600 text-white hover:bg-indigo-700 shadow-indigo-500/40 hover:px-12"
                                                 : "bg-slate-100 text-slate-300 cursor-not-allowed shadow-none"
                                     )}
                                 >
@@ -1469,7 +1469,7 @@ const CivilianDashboard = ({ user }) => {
             <div className="bg-slate-900 rounded-[5rem] p-16 text-white relative overflow-hidden shadow-2xl border border-white/5 group">
                 <div className="absolute top-0 right-0 w-full h-full bg-[radial-gradient(circle_at_70%_-20%,rgba(79,70,229,0.4),transparent)]" />
                 <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-indigo-600/20 rounded-full blur-[100px]" />
-                
+
                 <div className="relative z-10 grid lg:grid-cols-2 gap-20 items-center">
                     <div>
                         <div className="inline-flex items-center gap-2 bg-indigo-500/20 border border-indigo-400/20 px-4 py-2 rounded-full mb-8">
@@ -1496,7 +1496,7 @@ const CivilianDashboard = ({ user }) => {
                     <div className="flex flex-col items-center">
                         <div className="relative mb-12">
                             <div className="absolute inset-0 bg-indigo-600 blur-[80px] opacity-40 animate-pulse" />
-                            <motion.div 
+                            <motion.div
                                 animate={{ y: [0, -15, 0] }}
                                 transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
                                 className="w-64 h-64 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-[4rem] shadow-2xl flex items-center justify-center relative z-10 border border-white/20"
@@ -1504,7 +1504,7 @@ const CivilianDashboard = ({ user }) => {
                                 <Shield size={128} className="text-white drop-shadow-2xl" />
                             </motion.div>
                         </div>
-                        <motion.button 
+                        <motion.button
                             whileHover={{ scale: 1.05, boxShadow: "0 20px 40px rgba(79,70,229,0.4)" }}
                             whileTap={{ scale: 0.95 }}
                             className="bg-indigo-600 text-white px-16 py-7 rounded-[2.5rem] font-black text-2xl shadow-2xl flex items-center gap-4 group/btn"
@@ -1627,7 +1627,7 @@ const CivilianDashboard = ({ user }) => {
                 </div>
             </main>
 
-            <VoiceCommandCenter 
+            <VoiceCommandCenter
                 onCommand={handleVoiceCommand}
                 commands={[
                     "Go to Dashboard",
@@ -1645,20 +1645,20 @@ const CivilianDashboard = ({ user }) => {
             {/* Modern Hire Professional Modal */}
             <AnimatePresence>
                 {hiringModal.show && (
-                    <motion.div 
-                        initial={{ opacity: 0 }} 
-                        animate={{ opacity: 1 }} 
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         className="fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md"
                     >
-                        <motion.div 
-                            initial={{ scale: 0.9, y: 20 }} 
-                            animate={{ scale: 1, y: 0 }} 
+                        <motion.div
+                            initial={{ scale: 0.9, y: 20 }}
+                            animate={{ scale: 1, y: 0 }}
                             exit={{ scale: 0.9, y: 20 }}
                             className="bg-white w-full max-w-lg rounded-[3rem] shadow-2xl overflow-hidden border border-slate-100"
                         >
                             <div className="relative h-32 bg-gradient-to-r from-indigo-600 to-violet-700 p-8">
-                                <button 
+                                <button
                                     onClick={() => setHiringModal({ show: false, reportId: null, worker: null })}
                                     className="absolute top-6 right-6 text-white/50 hover:text-white transition-colors"
                                 >
@@ -1667,7 +1667,7 @@ const CivilianDashboard = ({ user }) => {
                                 <h3 className="text-2xl font-black text-white">Hire Professional</h3>
                                 <p className="text-indigo-100 text-sm font-medium">Fast-track resolution for your report</p>
                             </div>
-                            
+
                             <div className="p-8 space-y-6">
                                 <div className="flex items-center gap-6 p-4 bg-slate-50 rounded-3xl border border-slate-100">
                                     <img src={hiringModal.worker?.image} className="w-20 h-20 rounded-2xl object-cover shadow-lg" alt="" />
@@ -1700,13 +1700,13 @@ const CivilianDashboard = ({ user }) => {
                                 </div>
 
                                 <div className="flex gap-4 pt-2">
-                                    <button 
+                                    <button
                                         onClick={() => setHiringModal({ show: false, reportId: null, worker: null })}
                                         className="flex-1 px-6 py-4 rounded-2xl font-black text-slate-500 hover:bg-slate-50 transition-all border-2 border-slate-50"
                                     >
                                         Cancel
                                     </button>
-                                    <button 
+                                    <button
                                         onClick={confirmHire}
                                         disabled={hiringModal.loading}
                                         className="flex-[3] bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-4 rounded-[2rem] font-black shadow-xl shadow-indigo-100 disabled:opacity-50 flex items-center justify-center gap-2 grow"
@@ -1725,3 +1725,5 @@ const CivilianDashboard = ({ user }) => {
 };
 
 export default CivilianDashboard;
+
+

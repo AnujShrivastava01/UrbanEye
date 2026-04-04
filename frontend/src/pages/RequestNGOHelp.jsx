@@ -39,6 +39,11 @@ const RequestNGOHelp = () => {
         longitude: 77.2090
     });
 
+    useEffect(() => {
+        // Auto-detect location on mount
+        detectLocation();
+    }, []);
+
     const detectLocation = () => {
         if (!navigator.geolocation) {
             alert('Geolocation is not supported by your browser');
@@ -55,7 +60,7 @@ const RequestNGOHelp = () => {
                     // Reverse geocoding using Nominatim
                     const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&addressdetails=1`);
                     const data = await res.json();
-                    if (data.display_name) {
+                    if (data && data.display_name) {
                         setFormData(prev => ({ ...prev, address: data.display_name }));
                     } else {
                         setFormData(prev => ({ ...prev, address: `${latitude.toFixed(4)}, ${longitude.toFixed(4)}` }));
@@ -68,16 +73,16 @@ const RequestNGOHelp = () => {
                 }
             },
             (error) => {
-                console.error(error);
-                alert('Location access denied. Please enter address manually.');
+                console.error('Geolocation error:', error);
+                // Don't alert on mount auto-detect to avoid annoying users
                 setDetecting(false);
             },
-            { enableHighAccuracy: true }
+            { enableHighAccuracy: true, timeout: 5000 }
         );
     };
 
     const handleSubmit = async (e) => {
-        e.preventDefault();
+        if (e) e.preventDefault();
         if (!formData.description || !formData.category) return;
 
         setLoading(true);
@@ -90,7 +95,7 @@ const RequestNGOHelp = () => {
 
             if (res.data.success) {
                 setNgoResponse(res.data.request);
-                setTimeout(() => setSubmitted(true), 1500);
+                setTimeout(() => setSubmitted(true), 1000);
             }
         } catch (err) {
             console.error('Failed to submit request', err);
@@ -297,6 +302,10 @@ const RequestNGOHelp = () => {
                                 className="w-full bg-slate-50/50 rounded-[2.5rem] p-6 pl-16 text-lg font-bold text-slate-800 border-2 border-slate-100 focus:border-indigo-500 outline-none transition-all"
                                 placeholder="Detect automatically or enter manually..."
                                 value={formData.address}
+                                autoComplete="off"
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter') e.preventDefault();
+                                }}
                                 onChange={(e) => setFormData(prev => ({ ...prev, address: e.target.value }))}
                             />
                         </div>
