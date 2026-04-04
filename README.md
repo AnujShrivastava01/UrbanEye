@@ -14,7 +14,7 @@
 ### 🏙️ Civic Infrastructure Intelligence Platform
 
 <br/>
-### 🏙️ Civic Infrastructure Intelligence Platform
+
 
 <br/>
 
