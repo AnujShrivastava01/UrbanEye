@@ -8,7 +8,8 @@ const {
     ChevronLeft, ChevronRight, Building, Download, Sparkles, CloudRain,
     Newspaper, Plus, Clock, UserPlus, BadgeIndianRupee, Image, Loader2,
     Brain, Flame, Wifi, Link2, AlertOctagon, Gauge, History, Milestone,
-    Gift, Coffee, ParkingCircle, Home: HomeIcon, Filter, Globe, Building2, Medal, Award, Users, Trophy, List, Map: MapIcon, AlertTriangle, Settings
+    Gift, Coffee, ParkingCircle, Home: HomeIcon, Filter, Globe, Building2, Medal, Award, Users, Trophy, List, Map: MapIcon, AlertTriangle, Settings,
+    Briefcase, Heart
 } = Icons;
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
@@ -1173,7 +1174,8 @@ const CivilianDashboard = ({ user }) => {
         { id: 'overview', label: 'Dashboard', icon: LayoutDashboard },
         { id: 'reports', label: 'My Reports', icon: FileText },
         { id: 'leaderboard', label: 'Leaderboard', icon: Trophy },
-        { id: 'heatmap', label: 'Impact Map', icon: MapIcon },
+        { id: 'bookings', label: 'Gig Workers', icon: Briefcase },
+        { id: 'ngo', label: 'NGO Help', icon: Heart },
         { id: 'rewards', label: 'Rewards Lounge', icon: Sparkles },
         { id: 'settings', label: 'Settings', icon: Settings },
     ];
@@ -1270,6 +1272,8 @@ const CivilianDashboard = ({ user }) => {
                     {activeTab === 'reports' && <ReportsSection />}
                     {activeTab === 'leaderboard' && <LeaderboardSection />}
                     {activeTab === 'heatmap' && <ImpactHeatmapSection />}
+                    {activeTab === 'bookings' && <GigWorkersSection />}
+                    {activeTab === 'ngo' && <NGOHelpSection />}
                     {activeTab === 'rewards' && <RewardsSection />}
                     {activeTab === 'settings' && <SettingsSection />}
                 </div>
