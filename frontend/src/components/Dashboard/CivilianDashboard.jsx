@@ -55,9 +55,9 @@ const CivilianDashboard = ({ user }) => {
     
     // Mock workers for Marketplace demo
     const mockWorkers = [
-        { id: 1, name: 'Rahul Sharma', specialty: 'Pothole Specialist', rating: 4.9, completed: 124, price: 299, image: 'https://i.pravatar.cc/150?u=rahul' },
-        { id: 2, name: 'Priya Verma', specialty: 'Electrician (Lights)', rating: 4.8, completed: 89, price: 199, image: 'https://i.pravatar.cc/150?u=priya' },
-        { id: 3, name: 'Amit Kumar', specialty: 'Sanitation Expert', rating: 4.7, completed: 212, price: 399, image: 'https://i.pravatar.cc/150?u=amit' },
+        { id: 1, name: 'Rahul Sharma', specialty: 'Pothole Specialist', rating: 4.9, completed: 124, price: 299, image: 'https://randomuser.me/api/portraits/men/32.jpg' },
+        { id: 2, name: 'Priya Verma', specialty: 'Electrician (Lights)', rating: 4.8, completed: 89, price: 199, image: 'https://randomuser.me/api/portraits/women/44.jpg' },
+        { id: 3, name: 'Amit Kumar', specialty: 'Sanitation Expert', rating: 4.7, completed: 212, price: 399, image: 'https://randomuser.me/api/portraits/men/85.jpg' },
     ];
 
     const achievements = [
