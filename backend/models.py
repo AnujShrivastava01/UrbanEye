@@ -12,8 +12,8 @@ class User(db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(256), nullable=False)
     name = db.Column(db.String(100), nullable=False)
-    role = db.Column(db.String(50), nullable=False) # civilian, social_worker, gov_admin, dept_head, field_officer
-    department = db.Column(db.String(50), nullable=True) # Roads, Waste, etc.
+    role = db.Column(db.String(50), nullable=False, index=True) # civilian, social_worker, gov_admin, dept_head, field_officer
+    department = db.Column(db.String(50), nullable=True, index=True) # Roads, Waste, etc.
     created_at = db.Column(db.Integer, default=lambda: int(time.time()))
     
     def to_dict(self):
@@ -29,19 +29,19 @@ class Report(db.Model):
     __tablename__ = 'reports'
     
     id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
-    category = db.Column(db.String(50), nullable=False)
-    department = db.Column(db.String(50), nullable=False)
+    category = db.Column(db.String(50), nullable=False, index=True)
+    department = db.Column(db.String(50), nullable=False, index=True)
     description = db.Column(db.Text, nullable=True)
-    severity = db.Column(db.String(20), default='medium')
-    status = db.Column(db.String(20), default='open') # open, assigned, in_progress, resolved
-    user_id = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=True) # Link to reporter
-    assigned_to = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=True) # Link to field officer
+    severity = db.Column(db.String(20), default='medium', index=True)
+    status = db.Column(db.String(20), default='open', index=True) # open, assigned, in_progress, resolved
+    user_id = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=True, index=True) # Link to reporter
+    assigned_to = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=True, index=True) # Link to field officer
     
     latitude = db.Column(db.Float, nullable=True)
     longitude = db.Column(db.Float, nullable=True)
     image_url = db.Column(db.String(255), nullable=True)
     
-    created_at = db.Column(db.Integer, default=lambda: int(time.time()))
+    created_at = db.Column(db.Integer, default=lambda: int(time.time()), index=True)
     
     # Relationship with logs
     logs = db.relationship('ReportLog', backref='report', lazy=True, cascade="all, delete-orphan")
@@ -115,7 +115,7 @@ class Job(db.Model):
     report_id = db.Column(db.String(36), db.ForeignKey('reports.id'), nullable=False)
     worker_id = db.Column(db.String(36), db.ForeignKey('workers.id'), nullable=True)
     
-    status = db.Column(db.String(20), default='posted') # posted, accepted, in_progress, completed, verified
+    status = db.Column(db.String(20), default='posted', index=True) # posted, accepted, in_progress, completed, verified
     service_type = db.Column(db.String(20), nullable=False) # municipal, private, ngo
     
     quoted_price = db.Column(db.Float, nullable=True)
@@ -144,15 +144,15 @@ class Booking(db.Model):
     __tablename__ = 'bookings'
     
     id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
-    user_id = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=False)
-    report_id = db.Column(db.String(36), db.ForeignKey('reports.id'), nullable=True)
-    worker_id = db.Column(db.String(36), db.ForeignKey('workers.id'), nullable=True)
+    user_id = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=False, index=True)
+    report_id = db.Column(db.String(36), db.ForeignKey('reports.id'), nullable=True, index=True)
+    worker_id = db.Column(db.String(36), db.ForeignKey('workers.id'), nullable=True, index=True)
     
     service_type = db.Column(db.String(20), nullable=False)  # express, premium
     time_slot = db.Column(db.String(30), nullable=False)  # today_morning, today_evening, tomorrow, custom
     scheduled_at = db.Column(db.Integer, nullable=True)  # timestamp for custom time
     
-    status = db.Column(db.String(20), default='pending')  # pending, confirmed, assigned, in_progress, completed, cancelled
+    status = db.Column(db.String(20), default='pending', index=True)  # pending, confirmed, assigned, in_progress, completed, cancelled
     amount = db.Column(db.Float, nullable=False)
     payment_status = db.Column(db.String(20), default='pending')  # pending, paid, refunded
     
@@ -192,7 +192,7 @@ class NGORequest(db.Model):
     __tablename__ = 'ngo_requests'
     
     id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
-    user_id = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=False)
+    user_id = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=False, index=True)
     
     description = db.Column(db.Text, nullable=False)
     category = db.Column(db.String(50), nullable=False)  # environment, animal_welfare, sanitation, community, other
@@ -202,7 +202,7 @@ class NGORequest(db.Model):
     longitude = db.Column(db.Float, nullable=True)
     address = db.Column(db.String(255), nullable=True)
     
-    status = db.Column(db.String(20), default='submitted')  # submitted, reviewing, assigned, in_progress, resolved, closed
+    status = db.Column(db.String(20), default='submitted', index=True)  # submitted, reviewing, assigned, in_progress, resolved, closed
     ngo_id = db.Column(db.String(36), nullable=True)  # Assigned NGO
     ngo_name = db.Column(db.String(100), nullable=True)
     ngo_contact = db.Column(db.String(100), nullable=True)
@@ -266,10 +266,10 @@ class Attendance(db.Model):
     id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     user_id = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=False)
     
-    date = db.Column(db.String(20), nullable=False) # YYYY-MM-DD
+    date = db.Column(db.String(20), nullable=False, index=True) # YYYY-MM-DD
     check_in = db.Column(db.String(20), nullable=True) # HH:MM AM/PM
     check_out = db.Column(db.String(20), nullable=True)
-    status = db.Column(db.String(20), default='absent') # present, absent, late, half_day
+    status = db.Column(db.String(20), default='absent', index=True) # present, absent, late, half_day
     
     def to_dict(self):
         return {
@@ -287,8 +287,8 @@ class Payroll(db.Model):
     id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     user_id = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=False)
     
-    month = db.Column(db.String(20), nullable=False) # e.g. "October 2024"
-    year = db.Column(db.Integer, nullable=False)
+    month = db.Column(db.String(20), nullable=False, index=True) # e.g. "October 2024"
+    year = db.Column(db.Integer, nullable=False, index=True)
     
     base_salary = db.Column(db.Float, nullable=False)
     deductions = db.Column(db.Float, default=0.0)
@@ -321,8 +321,8 @@ class Candidate(db.Model):
     experience = db.Column(db.String(50), nullable=True)
     resume_url = db.Column(db.String(255), nullable=True)
     
-    status = db.Column(db.String(20), default='applied') # applied, shortlisted, interview, hired, rejected
-    created_at = db.Column(db.Integer, default=lambda: int(time.time()))
+    status = db.Column(db.String(20), default='applied', index=True) # applied, shortlisted, interview, hired, rejected
+    created_at = db.Column(db.Integer, default=lambda: int(time.time()), index=True)
     
     def to_dict(self):
         return {
