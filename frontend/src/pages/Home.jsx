@@ -65,8 +65,13 @@ const Home = () => {
     };
 
     const fetchStats = async () => {
+        if (!isAuthenticated()) {
+            return; // Use default stats to avoid 401 errors for unauthenticated users
+        }
         try {
-            const res = await axios.get(`${API_BASE}/reports`);
+            const res = await axios.get(`${API_BASE}/reports`, {
+                headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+            });
             if (res.data.reports) {
                 const reports = res.data.reports;
                 setStats({
@@ -497,7 +502,7 @@ const Home = () => {
             </section>
 
             {/* Dashboard Preview with Scroll Animation */}
-            <section className="bg-slate-50">
+            <section className="bg-slate-50 relative">
                 <ContainerScroll
                     titleComponent={
                         <>

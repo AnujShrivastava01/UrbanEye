@@ -290,37 +290,8 @@ const GovAdminDashboard = () => {
     };
     const [predictionMeta, setPredictionMeta] = useState(null);
 
-    // Fetch reports on mount
-    useEffect(() => {
-        const fetchReports = async () => {
-            try {
-                const token = localStorage.getItem('token');
-                const headers = token ? { Authorization: `Bearer ${token}` } : {};
-
-                const res = await axios.get(`${API_BASE}/gov/reports`, { headers });
-                if (res.data.success) {
-                    setReports(res.data.reports);
-                }
-            } catch (err) {
-                console.error("Failed to fetch reports", err);
-            }
-        };
-
-        const fetchEmployees = async () => {
-            try {
-                const token = localStorage.getItem('token');
-                const headers = token ? { Authorization: `Bearer ${token}` } : {};
-                const res = await axios.get(`${API_BASE}/gov/employees`, { headers });
-                if (res.data.success) {
-                    setEmployees(res.data.employees);
-                }
-            } catch (err) {
-                console.error("Failed to fetch employees", err);
-            }
-        };
-        fetchReports();
-        fetchEmployees();
-    }, []);
+    // The redundant fetchReports and fetchEmployees useEffect block was removed to prevent 404/CORS errors.
+    // fetchDashboardData handles all data fetching correctly.
 
     // Fetch Analytics
     useEffect(() => {
@@ -479,10 +450,7 @@ const GovAdminDashboard = () => {
             };
         });
 
-        // Log for debugging
-        console.log('Trend Data Generated:', trendData);
-        console.log('Total Reports:', filteredReports.length);
-        console.log('Sample Report Dates:', filteredReports.slice(0, 3).map(r => r.created_at));
+        // Logs removed per user request
 
         setTrendStats(trendData);
     };

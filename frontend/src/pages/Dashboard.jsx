@@ -72,8 +72,7 @@ const Dashboard = () => {
     const [activeView, setActiveView] = useState('overview');
 
     useEffect(() => {
-        console.log("Dashboard Loaded. Current User:", user);
-        console.log("User Role:", user?.role);
+        // Logs removed per user request
     }, [user]);
 
     const handleLogout = () => {

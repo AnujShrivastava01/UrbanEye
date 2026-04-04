@@ -51,21 +51,7 @@ const Login = () => {
         };
     }, []);
 
-    // Google One Tap Login
-    useGoogleOneTapLogin({
-        onSuccess: async (credentialResponse) => {
-            const result = await googleLogin(credentialResponse);
-            if (result.success) {
-                navigate(getRedirectPath(result.user), { replace: true });
-            } else {
-                setError(result.error);
-            }
-        },
-        onError: () => {
-            console.log('One Tap Login Failed');
-        },
-        disabled: isAuthenticated(),
-    });
+    // Removed useGoogleOneTapLogin as it conflicts with explicit <GoogleLogin> causing warning
 
     const startSlowTimer = () => {
         slowTimerRef.current = setTimeout(() => setSlowRequest(true), 3000);
@@ -189,17 +175,16 @@ const Login = () => {
                             <p className="text-slate-500 mt-1">Access your dashboard</p>
                         </div>
 
-                        {/* Google Sign In Button */}
+                        {/* Google Sign In Button (Temporarily Disabled to prevent 403 Origin Errors) */}
                         <div className="mb-6 flex justify-center">
-                            <GoogleLogin
+                            {/* <GoogleLogin
                                 onSuccess={handleGoogleSuccess}
                                 onError={() => setError('Google login failed')}
                                 theme="outline"
                                 size="large"
-                                width="100%"
                                 text="signin_with"
                                 shape="pill"
-                            />
+                            /> */}
                         </div>
 
                         <div className="flex items-center gap-4 mb-6">
