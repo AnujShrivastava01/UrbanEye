@@ -12,12 +12,19 @@ const ProtectedRoute = ({ children, roles = [] }) => {
         return <Navigate to="/login" state={{ from: location }} replace />;
     }
 
-    // If authenticated but user object hasn't loaded yet, wait
+    // If authenticated but user object hasn't loaded yet, wait briefly
     if (!user) return null;
 
-    if (roles.length > 0 && !hasRole(roles)) {
-        // User authenticated but not authorized
-        return <Navigate to="/unauthorized" replace />;
+    // If no specific roles required, allow any authenticated user
+    if (roles.length === 0) {
+        return children;
+    }
+
+    if (!hasRole(roles)) {
+        // User authenticated but not authorized — redirect to dashboard instead of a dead-end
+        // This handles edge cases where role doesn't match (e.g., stale token)
+        console.warn(`[ProtectedRoute] User role "${user.role}" not in allowed roles:`, roles);
+        return <Navigate to="/dashboard" replace />;
     }
 
     return children;

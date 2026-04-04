@@ -9,6 +9,19 @@ export const AuthProvider = ({ children }) => {
     const [token, setToken] = useState(localStorage.getItem('token'));
     const [loading, setLoading] = useState(true);
 
+    const buildUser = (decodedToken, userData) => {
+        // Flask-JWT-Extended stores identity in 'sub' and additional claims at top level
+        const merged = { ...decodedToken, ...userData };
+        
+        // Ensure role is resolved from all possible locations
+        const role = merged.role 
+            || decodedToken.role 
+            || userData?.role 
+            || 'civilian';
+        
+        return { ...merged, role };
+    };
+
     useEffect(() => {
         if (token) {
             try {
@@ -17,11 +30,13 @@ export const AuthProvider = ({ children }) => {
                 if (decoded.exp * 1000 < Date.now()) {
                     logout();
                 } else {
-                    setUser({ ...decoded, ...JSON.parse(localStorage.getItem('user_data') || '{}') });
+                    const userData = JSON.parse(localStorage.getItem('user_data') || '{}');
+                    setUser(buildUser(decoded, userData));
                     // Set default axios header
                     axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
                 }
             } catch (error) {
+                console.error('Token decode failed:', error);
                 logout();
             }
         }
@@ -41,7 +56,7 @@ export const AuthProvider = ({ children }) => {
             localStorage.setItem('token', access_token);
             localStorage.setItem('user_data', JSON.stringify(userData));
 
-            const mergedUser = { ...jwtDecode(access_token), ...userData };
+            const mergedUser = buildUser(jwtDecode(access_token), userData);
             setToken(access_token);
             setUser(mergedUser);
 
@@ -68,7 +83,7 @@ export const AuthProvider = ({ children }) => {
             localStorage.setItem('token', access_token);
             localStorage.setItem('user_data', JSON.stringify(userData));
 
-            const mergedUser = { ...jwtDecode(access_token), ...userData };
+            const mergedUser = buildUser(jwtDecode(access_token), userData);
             setToken(access_token);
             setUser(mergedUser);
 
@@ -116,7 +131,12 @@ export const AuthProvider = ({ children }) => {
 
         // Handle array or single string
         const roles = Array.isArray(allowedRoles) ? allowedRoles : [allowedRoles];
-        return roles.includes(user.role);
+        
+        // Check user.role against allowed roles
+        const userRole = user.role;
+        if (!userRole) return false;
+        
+        return roles.includes(userRole);
     };
 
     return (
@@ -127,3 +147,4 @@ export const AuthProvider = ({ children }) => {
 };
 
 export const useAuth = () => useContext(AuthContext);
+
