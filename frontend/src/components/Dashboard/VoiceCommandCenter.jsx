@@ -121,7 +121,7 @@ const VoiceCommandCenter = ({ onCommand, commands = [], currentStatus = '' }) =>
     };
 
     return (
-        <div className="fixed bottom-6 left-6 md:left-auto md:right-32 z-[2000] flex flex-col items-start md:items-end gap-3">
+        <div className="fixed bottom-[120px] right-[28px] z-[9998] flex flex-col items-end gap-3">
             {/* Help Modal Overlay */}
             <AnimatePresence>
                 {showHelp && (
