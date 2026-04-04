@@ -149,6 +149,7 @@ body {
     right: 0;
     height: 44px;
     z-index: 1000;
+    background-color: #1a2332;
 }
 
 /* Hide Google Translate UI elements */

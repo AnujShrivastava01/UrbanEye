@@ -687,7 +687,7 @@ const GovAdminDashboard = () => {
 
     return (
 
-        <div className="flex h-screen bg-slate-50 font-['Inter',sans-serif] text-slate-900 overflow-hidden">
+        <div className="fixed top-[44px] left-0 right-0 bottom-0 flex bg-slate-50 font-['Inter',sans-serif] text-slate-900 overflow-hidden">
             {/* Mobile Menu Button */}
             <button
                 className="lg:hidden flex fixed top-4 left-4 z-[1000] p-3 bg-slate-800 border-none rounded-lg text-white cursor-pointer hover:bg-slate-700 transition-colors"
@@ -802,7 +802,7 @@ const GovAdminDashboard = () => {
             </aside>
 
             {/* Main Content */}
-            <main className="flex-1 flex flex-col overflow-y-auto transition-all">
+            <main className="flex-1 min-w-0 flex flex-col overflow-y-auto overflow-x-hidden transition-all">
                 <header className="flex items-center justify-between px-8 py-6 bg-white/90 backdrop-blur-lg border-b border-slate-200/80 shadow-md flex-wrap gap-4">
                     <div>
                         <h1 className="text-3xl font-extrabold text-slate-900 m-0 flex items-center gap-3 tracking-tight bg-gradient-to-br from-slate-800 to-slate-600 bg-clip-text text-transparent">
