@@ -49,6 +49,13 @@ const CivilianDashboard = ({ user }) => {
     const [rewardTab, setRewardTab] = useState('available');
     const [bookings, setBookings] = useState([]);
     const [ngoRequests, setNgoRequests] = useState([]);
+    const [showNGOModal, setShowNGOModal] = useState(false);
+    const [ngoForm, setNgoForm] = useState({
+        category: 'sanitation',
+        description: '',
+        scale: 'medium',
+        address: ''
+    });
     const [claimedRewards, setClaimedRewards] = useState([]);
     const [showPassport, setShowPassport] = useState(false);
     const [hiringModal, setHiringModal] = useState({ show: false, reportId: null, worker: null });
@@ -168,6 +175,21 @@ const CivilianDashboard = ({ user }) => {
             if (res.data.success) setNgoRequests(res.data.requests);
         } catch (err) {
             console.error("Failed to fetch NGO requests", err);
+        }
+    };
+
+    const handleNGORequestSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            const res = await axios.post(`${API_BASE}/ngo/requests`, ngoForm, getAuthHeaders());
+            if (res.data.success) {
+                setShowNGOModal(false);
+                setNgoForm({ category: 'sanitation', description: '', scale: 'medium', address: '' });
+                fetchMyNGORequests();
+            }
+        } catch (err) {
+            console.error("NGO Submission failed", err);
+            alert(err.response?.data?.message || "Submission failed");
         }
     };
 
@@ -447,6 +469,123 @@ const CivilianDashboard = ({ user }) => {
                             <Zap className="inline mr-2" size={20} /> Fast Track with Gig Worker (₹300)
                         </button>
                     )}
+                </motion.div>
+            </motion.div>
+        );
+    };
+
+    const RequestNGOHelpModal = () => {
+        if (!showNGOModal) return null;
+        
+        const categories = [
+            { id: 'sanitation', name: 'Sanitation', icon: '🧹', desc: 'Clean-up drives, waste management' },
+            { id: 'environment', name: 'Environment', icon: '🌿', desc: 'Tree planting, pollution control' },
+            { id: 'animal_welfare', name: 'Animal Welfare', icon: '🐕', desc: 'Stray animals, injured wildlife' },
+            { id: 'community', name: 'Community', icon: '🏘️', desc: 'Health camps, infrastructure' },
+            { id: 'education', name: 'Education', icon: '📚', desc: 'Tutoring, book donation' }
+        ];
+
+        return (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-slate-900/40 backdrop-blur-md">
+                <motion.div 
+                    initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }}
+                    className="bg-white rounded-[3rem] w-full max-w-2xl overflow-hidden shadow-2xl relative border border-white/20"
+                >
+                    <div className="bg-gradient-to-br from-indigo-600 to-indigo-800 p-8 text-white relative">
+                        <button onClick={() => setShowNGOModal(false)} className="absolute top-8 right-8 text-white/50 hover:text-white transition-colors">
+                            <X size={24} />
+                        </button>
+                        <div className="flex items-center gap-4 mb-2">
+                             <div className="p-3 bg-white/10 rounded-2xl backdrop-blur-md">
+                                <Users size={24} />
+                             </div>
+                             <h2 className="text-3xl font-black tracking-tight">NGO Assistance</h2>
+                        </div>
+                        <p className="text-indigo-100 font-medium">Free, community-driven support for local issues</p>
+                    </div>
+
+                    <form onSubmit={handleNGORequestSubmit} className="p-8 space-y-6 max-h-[70vh] overflow-y-auto">
+                        <div>
+                            <label className="text-sm font-black text-slate-400 tracking-widest uppercase mb-4 block">Select Category</label>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                {categories.map(cat => (
+                                    <button
+                                        key={cat.id}
+                                        type="button"
+                                        onClick={() => setNgoForm({ ...ngoForm, category: cat.id })}
+                                        className={cn(
+                                            "flex items-center gap-4 p-4 rounded-2xl border-2 transition-all text-left",
+                                            ngoForm.category === cat.id 
+                                            ? "border-indigo-600 bg-indigo-50/50 shadow-sm" 
+                                            : "border-slate-100 hover:border-slate-200"
+                                        )}
+                                    >
+                                        <span className="text-2xl">{cat.icon}</span>
+                                        <div>
+                                            <p className="font-bold text-slate-800">{cat.name}</p>
+                                            <p className="text-xs text-slate-400 leading-tight">{cat.desc}</p>
+                                        </div>
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div>
+                            <label className="text-sm font-black text-slate-400 tracking-widest uppercase mb-3 block">Describe the Concern</label>
+                            <textarea 
+                                required
+                                value={ngoForm.description}
+                                onChange={(e) => setNgoForm({ ...ngoForm, description: e.target.value })}
+                                placeholder="Tell us exactly what's needed. More details help NGOs respond faster..."
+                                className="w-full bg-slate-50 border-none rounded-2xl p-5 text-slate-700 min-h-[120px] focus:ring-2 ring-indigo-500 transition-all font-medium"
+                            />
+                        </div>
+
+                        <div className="grid md:grid-cols-2 gap-6">
+                            <div>
+                                <label className="text-sm font-black text-slate-400 tracking-widest uppercase mb-3 block">Scale of Issue</label>
+                                <select 
+                                    value={ngoForm.scale}
+                                    onChange={(e) => setNgoForm({ ...ngoForm, scale: e.target.value })}
+                                    className="w-full bg-slate-50 border-none rounded-2xl p-4 text-slate-700 font-bold focus:ring-2 ring-indigo-500"
+                                >
+                                    <option value="small">Small (Individual/House)</option>
+                                    <option value="medium">Medium (Street/Block)</option>
+                                    <option value="large">Large (Community/Locality)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label className="text-sm font-black text-slate-400 tracking-widest uppercase mb-3 block">Location / Address</label>
+                                <div className="relative">
+                                    <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                                    <input 
+                                        required
+                                        type="text"
+                                        value={ngoForm.address}
+                                        onChange={(e) => setNgoForm({ ...ngoForm, address: e.target.value })}
+                                        placeholder="Enter landmark or area"
+                                        className="w-full bg-slate-50 border-none rounded-2xl py-4 pl-12 pr-4 text-slate-700 font-bold focus:ring-2 ring-indigo-500"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="pt-4 flex gap-4">
+                            <button 
+                                type="button"
+                                onClick={() => setShowNGOModal(false)}
+                                className="flex-1 py-5 rounded-2xl font-black text-slate-400 hover:bg-slate-50 transition-all"
+                            >
+                                Cancel
+                            </button>
+                            <button 
+                                type="submit"
+                                className="flex-[2] bg-slate-900 text-white py-5 rounded-2xl font-black shadow-xl hover:shadow-slate-200 transition-all transform hover:-translate-y-1 active:translate-y-0 flex items-center justify-center gap-3"
+                            >
+                                <Heart className="text-rose-400" size={20} /> Submit Request
+                            </button>
+                        </div>
+                    </form>
                 </motion.div>
             </motion.div>
         );
@@ -1067,39 +1206,97 @@ const CivilianDashboard = ({ user }) => {
     );
 
     // ========== NGO HELP SECTION ==========
-    const NGOHelpSection = () => (
-        <div className="space-y-8">
-            <div className="flex justify-between items-center">
-                <div>
-                    <h2 className="text-2xl font-black text-slate-900">NGO Assistance</h2>
-                    <p className="text-slate-400 font-bold">Request help from local NGOs</p>
-                </div>
-                <button onClick={() => navigate('/ngo-help')} className="bg-rose-500 text-white px-6 py-3 rounded-2xl font-black flex items-center gap-2 hover:bg-rose-600">
-                    <Heart size={20} /> Request Help
-                </button>
-            </div>
-            {ngoRequests.length === 0 ? (
-                <div className="bg-white rounded-[3rem] p-16 text-center border border-slate-100">
-                    <Heart size={40} className="mx-auto mb-4 text-rose-300" />
-                    <h3 className="text-xl font-black text-slate-800 mb-2">No requests yet</h3>
-                    <p className="text-slate-500 mb-6">Reach out to NGOs for community support</p>
-                    <button onClick={() => navigate('/ngo-help')} className="bg-rose-500 text-white px-8 py-3 rounded-2xl font-black">Get Help</button>
-                </div>
-            ) : (
-                <div className="grid gap-4">
-                    {ngoRequests.map(req => (
-                        <div key={req.id} className="bg-white p-6 rounded-[2rem] border border-slate-100 flex justify-between items-center">
-                            <div>
-                                <p className="font-black text-slate-800 capitalize">{req.category}</p>
-                                <p className="text-sm text-slate-500 line-clamp-1">{req.description}</p>
-                            </div>
-                            <StatusBadge status={req.status} />
+    const NGOHelpSection = () => {
+        const getCatIcon = (cat) => {
+            switch(cat) {
+                case 'sanitation': return '🧹';
+                case 'environment': return '🌿';
+                case 'animal_welfare': return '🐕';
+                case 'community': return '🏘️';
+                case 'education': return '📚';
+                default: return '📋';
+            }
+        };
+
+        const getStatusColor = (status) => {
+            switch(status) {
+                case 'submitted': return 'bg-blue-100 text-blue-600';
+                case 'reviewing': return 'bg-amber-100 text-amber-600';
+                case 'assigned': return 'bg-indigo-100 text-indigo-600';
+                case 'completed': return 'bg-emerald-100 text-emerald-600';
+                default: return 'bg-slate-100 text-slate-600';
+            }
+        };
+
+        return (
+            <div className="space-y-8">
+                <div className="flex justify-between items-center bg-white p-8 rounded-[3rem] border border-slate-100 shadow-xl shadow-slate-100">
+                    <div className="flex items-center gap-6">
+                        <div className="w-16 h-16 bg-rose-50 rounded-2xl flex items-center justify-center">
+                            <Heart className="text-rose-500" size={32} />
                         </div>
-                    ))}
+                        <div>
+                            <h2 className="text-3xl font-black text-slate-900 tracking-tight">NGO Volunteers</h2>
+                            <p className="text-slate-500 font-medium">Free assistance from verified social partners</p>
+                        </div>
+                    </div>
+                    <button 
+                        onClick={() => setShowNGOModal(true)}
+                        className="bg-slate-900 text-white px-8 py-4 rounded-2xl font-black flex items-center gap-3 hover:bg-rose-600 transition-all shadow-lg hover:shadow-rose-100"
+                    >
+                        <Plus size={20} /> Request Help
+                    </button>
                 </div>
-            )}
-        </div>
-    );
+
+                {ngoRequests.length === 0 ? (
+                    <div className="bg-slate-50/50 rounded-[3.5rem] p-20 text-center border-2 border-dashed border-slate-100">
+                        <p className="text-slate-400 font-black mb-2 uppercase tracking-widest text-sm">Community Support</p>
+                        <h3 className="text-2xl font-black text-slate-800">No active petitions</h3>
+                        <p className="text-slate-500 font-medium mt-2 max-w-sm mx-auto">Requests here are free and handled by community NGOs like feeding drives or animal rescue.</p>
+                    </div>
+                ) : (
+                    <div className="grid md:grid-cols-2 gap-6">
+                        {ngoRequests.map((req, idx) => (
+                            <motion.div 
+                                key={idx}
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: idx * 0.1 }}
+                                className="bg-white p-6 rounded-[2.5rem] border border-slate-100 hover:shadow-2xl transition-all group"
+                            >
+                                <div className="flex justify-between items-start mb-6">
+                                    <div className="flex items-center gap-4">
+                                        <div className="text-3xl p-3 bg-slate-50 rounded-2xl group-hover:bg-rose-50 transition-colors">
+                                            {getCatIcon(req.category)}
+                                        </div>
+                                        <div>
+                                            <h4 className="font-black text-slate-800 capitalize tracking-tight">{req.category?.replace('_', ' ')}</h4>
+                                            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">{req.scale} scale • {new Date(req.created_at * 1000).toLocaleDateString()}</p>
+                                        </div>
+                                    </div>
+                                    <span className={cn("px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest", getStatusColor(req.status))}>
+                                        {req.status}
+                                    </span>
+                                </div>
+                                <p className="text-slate-600 text-sm font-medium leading-relaxed mb-6 line-clamp-2">
+                                    {req.description}
+                                </p>
+                                <div className="flex items-center justify-between pt-6 border-t border-slate-50">
+                                    <div className="flex items-center gap-2 text-slate-400">
+                                        <MapPin size={14} />
+                                        <span className="text-xs font-bold truncate max-w-[150px]">{req.address || "Location pending"}</span>
+                                    </div>
+                                    <button className="text-indigo-600 font-black text-xs uppercase hover:underline">
+                                        View Updates
+                                    </button>
+                                </div>
+                            </motion.div>
+                        ))}
+                    </div>
+                )}
+            </div>
+        );
+    };
 
     // ========== REWARDS SECTION ==========
     const RewardsSection = () => (
@@ -1522,6 +1719,7 @@ const CivilianDashboard = ({ user }) => {
                     </motion.div>
                 )}
             </AnimatePresence>
+            <RequestNGOHelpModal />
         </div>
     );
 };

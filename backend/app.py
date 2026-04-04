@@ -2776,8 +2776,16 @@ class MyNGORequests(Resource):
     def get(self):
         """Get current user's NGO help requests"""
         current_user_id = get_jwt_identity()
-        requests = NGORequest.query.filter_by(user_id=current_user_id).order_by(NGORequest.created_at.desc()).all()
-        return {'success': True, 'requests': [r.to_dict() for r in requests]}, 200
+        try:
+            requests = NGORequest.query.filter_by(user_id=current_user_id).order_by(NGORequest.created_at.desc()).all()
+            return {
+                'success': True, 
+                'requests': [r.to_dict() for r in requests],
+                'count': len(requests)
+            }, 200
+        except Exception as e:
+            logger.error(f"Error fetching NGO requests: {e}")
+            return {'success': False, 'message': 'Failed to fetch requests'}, 500
 
 @ngo_ns.route('/requests')
 class CreateNGORequest(Resource):
@@ -2788,16 +2796,33 @@ class CreateNGORequest(Resource):
         current_user_id = get_jwt_identity()
         data = request.json
         
-        new_request = NGORequest(
-            user_id=current_user_id,
-            category=data.get('category', 'general'),
-            description=data.get('description', ''),
-            urgency_level=data.get('urgency_level', 'medium'),
-            location=data.get('location', '')
-        )
-        
-        db.session.add(new_request)
-        db.session.commit()
+        if not data.get('description') or not data.get('category'):
+            return {'success': False, 'message': 'Description and category are required'}, 400
+            
+        try:
+            new_request = NGORequest(
+                user_id=current_user_id,
+                category=data.get('category', 'other'),
+                description=data.get('description', ''),
+                scale=data.get('scale', 'medium'),
+                address=data.get('address', ''),
+                latitude=data.get('latitude'),
+                longitude=data.get('longitude'),
+                status='submitted'
+            )
+            
+            db.session.add(new_request)
+            db.session.commit()
+            
+            return {
+                'success': True, 
+                'message': 'NGO assistance request submitted successfully', 
+                'request': new_request.to_dict()
+            }, 201
+        except Exception as e:
+            db.session.rollback()
+            logger.error(f"Error creating NGO request: {e}")
+            return {'success': False, 'message': 'Failed to submit request'}, 500
         return {'success': True, 'request': new_request.to_dict()}, 201
 
 # ============== SINGLE REPORT DETAIL ==============
