@@ -18,8 +18,8 @@
     <a href="#"><img alt="Flutter" src="https://img.shields.io/badge/Frontend-Flutter-blue.svg?logo=flutter"/></a>
     <a href="#"><img alt="Flask" src="https://img.shields.io/badge/Backend-Flask-black.svg?logo=flask"/></a>
     <a href="#"><img alt="Firebase" src="https://img.shields.io/badge/Database-Firebase-orange.svg?logo=firebase"/></a>
-    <a href="#"><img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/Akshit2807/UrbanEye.svg"/></a>
-    <a href="#"><img alt="GitHub issues" src="https://img.shields.io/github/issues/Akshit2807/UrbanEye.svg"/></a>
+    <a href="#"><img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/AnujShrivastava01/UrbanEye.svg"/></a>
+    <a href="#"><img alt="GitHub issues" src="https://img.shields.io/github/issues/AnujShrivastava01/UrbanEye.svg"/></a>
   </p>
 </div>
 
@@ -50,7 +50,7 @@ Check out our project in action!
 <td width="50%">
 
 <a href="https://urban-eye-jfcf-3a9x5uwfu-akpahade55-9707s-projects.vercel.app/">
-  <img src="https://github.com/Akshit2807/UrbanEye/blob/main/demo/UE-website.png?raw=true" width="100%"/>
+  <img src="https://raw.githubusercontent.com/AnujShrivastava01/UrbanEye/main/app/demo/UE-website.png" width="100%"/>
 </a>
 
 </td>
@@ -79,7 +79,7 @@ Here's a sneak peek into the UrbanEye app interface.
 
 | Welcome Screen | Report an Issue | Issue Tracking |
 | :---: | :---: | :---: |
-| <a href="https://youtu.be/1qoraqzspt4" target="_blank"><img src="https://github.com/Akshit2807/UrbanEye/blob/main/demo/UE-demo-1.jpg" alt="Welcome Screen" width="250"></a> | <a href="https://youtu.be/1qoraqzspt4" target="_blank"><img src="https://github.com/Akshit2807/UrbanEye/blob/main/demo/UE-demo-3.jpg" alt="Report an Issue" width="250"></a> | <a href="https://youtu.be/1qoraqzspt4" target="_blank"><img src="https://github.com/Akshit2807/UrbanEye/blob/main/demo/UE-demo-2.jpg" alt="Issue Tracking" width="250"></a> |
+| <a href="https://youtu.be/1qoraqzspt4" target="_blank"><img src="https://raw.githubusercontent.com/AnujShrivastava01/UrbanEye/main/app/demo/UE-demo-1.jpg" alt="Welcome Screen" width="250"></a> | <a href="https://youtu.be/1qoraqzspt4" target="_blank"><img src="https://raw.githubusercontent.com/AnujShrivastava01/UrbanEye/main/app/demo/UE-demo-3.jpg" alt="Report an Issue" width="250"></a> | <a href="https://youtu.be/1qoraqzspt4" target="_blank"><img src="https://raw.githubusercontent.com/AnujShrivastava01/UrbanEye/main/app/demo/UE-demo-2.jpg" alt="Issue Tracking" width="250"></a> |
 | *A vibrant welcome screen to greet users.* | *Simple and quick issue reporting.* | *Track the status of your reports.* |
 
 
@@ -123,7 +123,7 @@ To get a local copy up and running, follow these simple steps.
 
 1.  **Clone the repository:**
     ```sh
-    git clone [https://github.com/Akshit2807/UrbanEye.git](https://github.com/Akshit2807/UrbanEye.git)
+    git clone https://github.com/AnujShrivastava01/UrbanEye.git
     cd UrbanEye/backend  # Navigate to the backend folder
     ```
 2.  **Setup Firebase Admin SDK:**
@@ -148,7 +148,7 @@ To get a local copy up and running, follow these simple steps.
 
 1.  **Navigate to the frontend folder:**
     ```sh
-    cd ../frontend # Or your flutter app directory name
+    cd ../app # Our flutter app directory
     ```
 2.  **Configure Firebase for Flutter:**
     * Follow the [FlutterFire installation guide](https://firebase.flutter.dev/docs/overview#installation) to connect your Flutter app to your Firebase project. This will involve adding a `google-services.json` (for Android) and `GoogleService-Info.plist` (for iOS) to your app.
@@ -184,9 +184,7 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 ## 📬 Contact
 
-Akshit - [@akshit-pahade](https://www.linkedin.com/in/akshit-pahade/) - akpahade55@gmail.com
-
-Project Link: [https://github.com/Akshit2807/UrbanEye](https://github.com/Akshit2807/UrbanEye)
+Project Link: [https://github.com/AnujShrivastava01/UrbanEye](https://github.com/AnujShrivastava01/UrbanEye)
 
 <div align="center">
   <br />

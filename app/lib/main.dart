@@ -4,7 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'firebase_options.dart';
-import 'utils/app_colors.dart';
+import 'views/auth/role_selection_page.dart';
+import 'views/auth/login_page.dart';
+import 'views/auth/signup_page.dart';
+import 'views/civilian/civilian_dashboard.dart';
+import 'views/social_worker/social_worker_dashboard.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -65,11 +69,9 @@ class CivicReporterApp extends StatelessWidget {
         // Color Scheme
         colorScheme: ColorScheme.fromSeed(
           seedColor: AppColors.primary,
-          brightness: Brightness.light,
           primary: AppColors.primary,
           secondary: AppColors.secondary,
           surface: AppColors.surface,
-          background: AppColors.background,
           error: AppColors.error,
         ),
 
@@ -301,7 +303,7 @@ class CivicReporterApp extends StatelessWidget {
           titleTextStyle: GoogleFonts.poppins(
             fontSize: 20,
             fontWeight: FontWeight.w600,
-            color: AppColors.textPrimary, // fixed from textDark
+            color: AppColors.textPrimary,
           ),
           contentTextStyle: GoogleFonts.inter(
             fontSize: 14,
@@ -352,18 +354,21 @@ class CivicReporterApp extends StatelessWidget {
         splashFactory: InkRipple.splashFactory,
       ),
 
-      // Basic Phase 1 App Skeleton
-      home: Scaffold(
-        appBar: AppBar(title: const Text('UrbanEye Initialized')),
-        body: const Center(child: Text('Phase 1: App Setup Complete')),
-      ),
+      // Routing for the App
+      initialRoute: '/',
+      routes: {
+        '/': (context) => const RoleSelectionPage(),
+        '/login': (context) => const LoginPage(),
+        '/signup': (context) => const SignupPage(),
+        '/civilian_dashboard': (context) => const CivilianDashboard(),
+        '/social_worker_dashboard': (context) => const SocialWorkerDashboard(),
+      },
 
       // Global Builder for additional customizations
       builder: (context, child) {
         return MediaQuery(
           // Prevent text scaling beyond reasonable limits
-          data: MediaQuery.of(context).copyWith(
-          ),
+          data: MediaQuery.of(context).copyWith(),
           child: child!,
         );
       },
