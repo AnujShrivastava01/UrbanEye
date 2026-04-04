@@ -842,7 +842,7 @@ const CivilianDashboard = ({ user }) => {
         const cities = ['Global', 'Indore', 'Delhi', 'Gwalior', 'Mumbai', 'Canberra'];
 
         return (
-            <div className="dashboard-container">
+            <div className="space-y-12">
                 {/* Header & Filters */}
                 <div className="bg-white rounded-[3rem] p-10 border border-slate-100 shadow-2xl overflow-hidden relative">
                     <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-50 rounded-full blur-[120px] -mr-48 -mt-48 opacity-60 animate-pulse" />
@@ -900,27 +900,28 @@ const CivilianDashboard = ({ user }) => {
                                 animate={{ y: 0, opacity: 1 }}
                                 transition={{ delay: i * 0.1 }}
                                 className={cn(
-                                    "p-10 rounded-[3.5rem] relative overflow-hidden group border-2 transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl",
-                                    i === 0 ? "bg-gradient-to-br from-amber-400 via-orange-500 to-amber-600 text-white border-amber-300 shadow-amber-200/50" :
-                                        i === 1 ? "bg-white border-slate-200 shadow-slate-100" : "bg-white border-orange-100 shadow-orange-50"
+                                    "p-10 rounded-[3.5rem] relative overflow-hidden group border transition-all duration-500 hover:-translate-y-4 hover:shadow-2xl text-white transform hover:scale-105",
+                                    i === 0 ? "z-10" : ""
                                 )}
+                                style={{
+                                    background: i === 0 ? 'linear-gradient(135deg, #f59e0b, #ea580c, #d97706)' : i === 1 ? 'linear-gradient(135deg, #64748b, #475569, #1e293b)' : 'linear-gradient(135deg, #ea580c, #be123c, #7c2d12)',
+                                    borderColor: i === 0 ? '#fbbf24' : i === 1 ? '#94a3b8' : '#f97316',
+                                    boxShadow: i === 0 ? '0 20px 50px rgba(245,158,11,0.5)' : i === 1 ? '0 20px 50px rgba(100,116,139,0.5)' : '0 20px 50px rgba(194,65,12,0.5)'
+                                }}
                             >
                                 <div className="absolute top-6 right-8 text-8xl font-black opacity-10 group-hover:scale-110 group-hover:opacity-20 transition-all duration-700">{i + 1}</div>
                                 <div className="relative z-10 flex flex-col items-center text-center">
-                                    <div className={cn(
-                                        "w-24 h-24 rounded-[2.5rem] flex items-center justify-center mb-6 shadow-2xl relative",
-                                        i === 0 ? "bg-white/20 backdrop-blur-md ring-4 ring-white/30" : "bg-slate-50 ring-4 ring-slate-100"
-                                    )}>
-                                        <Users size={40} className={i === 0 ? "text-white" : "text-slate-400"} />
+                                    <div className="w-24 h-24 rounded-[2.5rem] flex items-center justify-center mb-6 shadow-2xl relative bg-white/20 backdrop-blur-md ring-4 ring-white/30">
+                                        <Users size={40} className="text-white" />
                                         {i === 0 && <Sparkles className="absolute -top-4 -right-4 text-white animate-pulse" size={32} />}
                                     </div>
-                                    <h3 className={cn("text-2xl font-black mb-2", i === 0 ? "text-white" : "text-slate-900")}>{entry.name}</h3>
-                                    <p className={cn("text-xs font-black opacity-80 mb-6 uppercase tracking-[0.2em]", i === 0 ? "text-white" : "text-slate-400")}>{entry.city || 'Global contributor'}</p>
-                                    <div className={cn("px-8 py-3 rounded-2xl font-black text-2xl shadow-inner", i === 0 ? "bg-white/20" : "bg-indigo-50 text-indigo-600")}>
+                                    <h3 className="text-2xl font-black mb-2 text-white">{entry.name}</h3>
+                                    <p className="text-xs font-black opacity-80 mb-6 uppercase tracking-[0.2em] text-white">{entry.city || 'Global contributor'}</p>
+                                    <div className="px-8 py-3 rounded-2xl font-black text-2xl shadow-inner bg-white/20 text-white">
                                         {entry.xp} <span className="text-sm opacity-60">XP</span>
                                     </div>
 
-                                    <div className="flex gap-4 mt-8 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                                    <div className="flex gap-4 mt-8 opacity-0 group-hover:opacity-100 transition-opacity duration-500 text-white">
                                         <div className="text-center">
                                             <p className="text-[10px] font-black uppercase tracking-tighter opacity-70">Impact</p>
                                             <p className="text-sm font-black">Top 1%</p>
@@ -944,28 +945,29 @@ const CivilianDashboard = ({ user }) => {
                                 animate={{ y: 0, opacity: 1 }}
                                 transition={{ delay: i * 0.1 }}
                                 className={cn(
-                                    "p-10 rounded-[3.5rem] relative overflow-hidden group border-2 transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl",
-                                    i === 0 ? "bg-gradient-to-br from-emerald-400 via-green-600 to-emerald-700 text-white border-emerald-300 shadow-emerald-200/50" :
-                                        i === 1 ? "bg-white border-slate-200 shadow-slate-100" : "bg-white border-blue-100 shadow-blue-50"
+                                    "p-10 rounded-[3.5rem] relative overflow-hidden group border transition-all duration-500 hover:-translate-y-4 hover:shadow-2xl text-white transform hover:scale-105",
+                                    i === 0 ? "z-10" : ""
                                 )}
+                                style={{
+                                    background: i === 0 ? 'linear-gradient(135deg, #f59e0b, #ea580c, #d97706)' : i === 1 ? 'linear-gradient(135deg, #64748b, #475569, #1e293b)' : 'linear-gradient(135deg, #ea580c, #be123c, #7c2d12)',
+                                    borderColor: i === 0 ? '#fbbf24' : i === 1 ? '#94a3b8' : '#f97316',
+                                    boxShadow: i === 0 ? '0 20px 50px rgba(245,158,11,0.5)' : i === 1 ? '0 20px 50px rgba(100,116,139,0.5)' : '0 20px 50px rgba(194,65,12,0.5)'
+                                }}
                             >
-                                <div className="absolute top-6 right-8 text-8xl font-black opacity-10">{i + 1}</div>
+                                <div className="absolute top-6 right-8 text-8xl font-black opacity-10 group-hover:scale-110 group-hover:opacity-20 transition-all duration-700">{i + 1}</div>
                                 <div className="relative z-10 flex flex-col items-center text-center">
-                                    <div className={cn(
-                                        "w-24 h-24 rounded-[2.5rem] flex items-center justify-center mb-6 shadow-2xl",
-                                        i === 0 ? "bg-white/20 backdrop-blur-md ring-4 ring-white/30" : "bg-slate-50 ring-4 ring-slate-100"
-                                    )}>
-                                        <Building2 size={40} className={i === 0 ? "text-white" : "text-emerald-500"} />
+                                    <div className="w-24 h-24 rounded-[2.5rem] flex items-center justify-center mb-6 shadow-2xl bg-white/20 backdrop-blur-md ring-4 ring-white/30">
+                                        <Building2 size={40} className="text-white" />
                                     </div>
-                                    <h3 className={cn("text-2xl font-black mb-2", i === 0 ? "text-white" : "text-slate-900")}>{m.name}</h3>
-                                    <div className="grid grid-cols-2 gap-6 mt-6 w-full max-w-[200px]">
+                                    <h3 className="text-2xl font-black mb-2 text-white">{m.name}</h3>
+                                    <div className="grid grid-cols-2 gap-6 mt-6 w-full max-w-[200px] text-white">
                                         <div className="text-center">
-                                            <p className={cn("text-[10px] font-black uppercase tracking-tight opacity-70", i === 0 ? "text-white" : "text-slate-400")}>SLA Success</p>
-                                            <p className={cn("text-2xl font-black", i === 0 ? "text-white" : "text-emerald-600")}>{m.efficiency}%</p>
+                                            <p className="text-[10px] font-black uppercase tracking-tight opacity-70">SLA Success</p>
+                                            <p className="text-2xl font-black">{m.efficiency}%</p>
                                         </div>
-                                        <div className={cn("text-center border-l", i === 0 ? "border-white/20" : "border-slate-100")}>
-                                            <p className={cn("text-[10px] font-black uppercase tracking-tight opacity-70", i === 0 ? "text-white" : "text-slate-400")}>Solved</p>
-                                            <p className={cn("text-2xl font-black", i === 0 ? "text-white" : "text-emerald-600")}>{m.resolved}</p>
+                                        <div className="text-center border-l border-white/20">
+                                            <p className="text-[10px] font-black uppercase tracking-tight opacity-70">Solved</p>
+                                            <p className="text-2xl font-black">{m.resolved}</p>
                                         </div>
                                     </div>
                                     <div className="mt-8 w-full bg-black/10 rounded-full h-1.5 overflow-hidden">
