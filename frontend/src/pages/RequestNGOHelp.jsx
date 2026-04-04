@@ -1,26 +1,32 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Heart, MapPin, AlertCircle, Check, Loader, ChevronLeft } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { 
+    Heart, MapPin, AlertCircle, Check, Loader2, 
+    ChevronLeft, Sparkles, Send, Info, ShieldCheck,
+    Target
+} from 'lucide-react';
 import './RequestNGOHelp.css';
 
 const CATEGORIES = [
     { id: 'environment', label: 'Environment', icon: '🌿', description: 'Tree planting, pollution, green initiatives' },
     { id: 'animal_welfare', label: 'Animal Welfare', icon: '🐕', description: 'Stray animals, injured animals, shelters' },
     { id: 'sanitation', label: 'Sanitation', icon: '🧹', description: 'Clean-up drives, waste management' },
-    { id: 'community', label: 'Community Development', icon: '🏘️', description: 'Infrastructure, education, health camps' },
+    { id: 'community', label: 'Community', icon: '🏘️', description: 'Infrastructure, education, health camps' },
     { id: 'other', label: 'Other', icon: '📋', description: 'Any other community issue' },
 ];
 
 const SCALES = [
-    { id: 'small', label: 'Small', description: '1-5 people can handle', color: '#22c55e' },
-    { id: 'medium', label: 'Medium', description: '5-15 volunteers needed', color: '#f59e0b' },
-    { id: 'large', label: 'Large', description: '15+ volunteers required', color: '#ef4444' },
+    { id: 'small', label: 'Small', description: '1-5 people', color: '#10b981' },
+    { id: 'medium', label: 'Medium', description: '5-15 volunteers', color: '#f59e0b' },
+    { id: 'large', label: 'Large', description: '15+ volunteers', color: '#f43f5e' },
 ];
 
 const RequestNGOHelp = () => {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
+    const [detecting, setDetecting] = useState(false);
     const [submitted, setSubmitted] = useState(false);
     const [ngoResponse, setNgoResponse] = useState(null);
 
@@ -33,12 +39,46 @@ const RequestNGOHelp = () => {
         longitude: 77.2090
     });
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        if (!formData.description || !formData.category) {
-            alert('Please fill all required fields');
+    const detectLocation = () => {
+        if (!navigator.geolocation) {
+            alert('Geolocation is not supported by your browser');
             return;
         }
+
+        setDetecting(true);
+        navigator.geolocation.getCurrentPosition(
+            async (position) => {
+                const { latitude, longitude } = position.coords;
+                setFormData(prev => ({ ...prev, latitude, longitude }));
+                
+                try {
+                    // Reverse geocoding using Nominatim
+                    const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&addressdetails=1`);
+                    const data = await res.json();
+                    if (data.display_name) {
+                        setFormData(prev => ({ ...prev, address: data.display_name }));
+                    } else {
+                        setFormData(prev => ({ ...prev, address: `${latitude.toFixed(4)}, ${longitude.toFixed(4)}` }));
+                    }
+                } catch (err) {
+                    console.error('Reverse geocoding failed', err);
+                    setFormData(prev => ({ ...prev, address: `${latitude.toFixed(4)}, ${longitude.toFixed(4)}` }));
+                } finally {
+                    setDetecting(false);
+                }
+            },
+            (error) => {
+                console.error(error);
+                alert('Location access denied. Please enter address manually.');
+                setDetecting(false);
+            },
+            { enableHighAccuracy: true }
+        );
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (!formData.description || !formData.category) return;
 
         setLoading(true);
         try {
@@ -50,155 +90,244 @@ const RequestNGOHelp = () => {
 
             if (res.data.success) {
                 setNgoResponse(res.data.request);
-                setSubmitted(true);
+                setTimeout(() => setSubmitted(true), 1500);
             }
         } catch (err) {
             console.error('Failed to submit request', err);
-            alert('Failed to submit request. Please try again.');
+            alert('Submission failed. Please check your connection.');
         } finally {
             setLoading(false);
         }
     };
 
-    if (submitted && ngoResponse) {
+    if (submitted) {
         return (
-            <div className="ngo-help-page container">
-                <div className="success-container">
-                    <div className="success-icon">
-                        <Check size={48} />
-                    </div>
-                    <h1>Request Submitted! 🙏</h1>
-                    <p className="text-muted">An NGO partner will review your request within 24 hours.</p>
+            <div className="ngo-help-page flex items-center justify-center p-6">
+                <motion.div 
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="max-w-xl w-full glass-card rounded-[3rem] p-12 text-center relative overflow-hidden"
+                >
+                    <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-emerald-400 to-indigo-500" />
+                    
+                    <motion.div 
+                        initial={{ y: 20, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        transition={{ delay: 0.2 }}
+                        className="w-24 h-24 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-8"
+                    >
+                        <Check className="text-emerald-500" size={48} />
+                    </motion.div>
 
-                    <div className="ngo-card glass-panel">
-                        <div className="ngo-icon">
-                            <Heart size={32} />
+                    <h1 className="text-4xl font-black text-slate-900 mb-4">Request Sent!</h1>
+                    <p className="text-slate-500 font-medium text-lg mb-10 leading-relaxed">
+                        Your petition for community assistance has been successfully broadcasted to our NGO partners.
+                    </p>
+
+                    <div className="bg-slate-50 rounded-3xl p-8 text-left space-y-4 mb-10 border border-slate-100">
+                        <div className="flex justify-between items-center pb-4 border-b border-slate-200">
+                            <span className="text-slate-400 font-black uppercase text-xs tracking-widest">Tracking ID</span>
+                            <code className="bg-white px-3 py-1 rounded-lg text-indigo-600 font-bold border border-indigo-50">
+                                {ngoResponse?.id?.slice(0, 10).toUpperCase()}
+                            </code>
                         </div>
-                        <div className="ngo-info">
-                            <h3>{ngoResponse.ngo?.name}</h3>
-                            <p>📧 {ngoResponse.ngo?.contact}</p>
-                            <p className="status">Status: <span className="badge reviewing">Reviewing</span></p>
+                        <div className="flex justify-between items-center">
+                            <span className="text-slate-400 font-bold text-sm">Target Category</span>
+                            <span className="text-slate-800 font-black capitalize">{formData.category.replace('_', ' ')}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                            <span className="text-slate-400 font-bold text-sm">Response Time</span>
+                            <span className="text-indigo-600 font-black tracking-tight underline transition-all">~24 Hours</span>
                         </div>
                     </div>
 
-                    <div className="request-details glass-panel">
-                        <h4>Your Request</h4>
-                        <div className="detail-row">
-                            <span>Category</span>
-                            <strong>{formData.category?.replace('_', ' ')}</strong>
-                        </div>
-                        <div className="detail-row">
-                            <span>Scale</span>
-                            <strong>{formData.scale}</strong>
-                        </div>
-                        <div className="detail-row">
-                            <span>Request ID</span>
-                            <code>{ngoResponse.id?.slice(0, 8)}</code>
-                        </div>
+                    <div className="flex flex-col sm:flex-row gap-4">
+                        <button 
+                            onClick={() => navigate('/dashboard')}
+                            className="flex-1 bg-slate-900 text-white px-8 py-5 rounded-2xl font-black hover:bg-slate-800 transition-all shadow-xl shadow-slate-200"
+                        >
+                            Back to Dashboard
+                        </button>
+                        <button 
+                            onClick={() => window.print()}
+                            className="flex-1 bg-white text-slate-900 border-2 border-slate-100 px-8 py-5 rounded-2xl font-black hover:bg-slate-50 transition-all"
+                        >
+                            Save Receipt
+                        </button>
                     </div>
-
-                    <button className="btn btn-primary btn-lg" onClick={() => navigate('/dashboard')}>
-                        Go to Dashboard
-                    </button>
-                </div>
+                </motion.div>
             </div>
         );
     }
 
     return (
-        <div className="ngo-help-page container">
-            <button className="back-btn" onClick={() => navigate('/dashboard')}>
-                <ChevronLeft size={20} /> Back to Dashboard
-            </button>
+        <div className="ngo-help-page px-6">
+            <div className="max-w-4xl mx-auto">
+                {/* Header Section */}
+                <header className="mb-12">
+                    <motion.button 
+                        whileHover={{ x: -4 }}
+                        onClick={() => navigate('/dashboard')}
+                        className="flex items-center gap-2 text-slate-400 font-black uppercase text-xs tracking-widest mb-10 hover:text-indigo-600 transition-colors"
+                    >
+                        <ChevronLeft size={16} /> Back to Hub
+                    </motion.button>
+                    
+                    <div className="flex flex-col items-center text-center">
+                        <motion.div 
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            className="w-20 h-20 bg-rose-50 rounded-[2rem] flex items-center justify-center mb-6 pulse-rose shadow-xl shadow-rose-100"
+                        >
+                            <Heart className="text-rose-500 fill-rose-500" size={32} />
+                        </motion.div>
+                        <motion.h1 
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="text-5xl font-black text-slate-900 tracking-tighter mb-4"
+                        >
+                            Request NGO Help
+                        </motion.h1>
+                        <motion.p 
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.1 }}
+                            className="text-slate-500 text-lg font-medium max-w-md"
+                        >
+                            Get free assistance from verified community partners for local non-commercial issues.
+                        </motion.p>
+                    </div>
+                </header>
 
-            <div className="page-header">
-                <div className="header-icon">
-                    <Heart size={32} />
-                </div>
-                <h1>Request NGO Assistance</h1>
-                <p className="text-muted">Get free help from verified NGO partners for community issues</p>
+                <form onSubmit={handleSubmit} className="space-y-12 pb-20">
+                    {/* Category Grid */}
+                    <section>
+                        <div className="flex items-center justify-between mb-6 px-1">
+                            <h3 className="font-black text-slate-900 uppercase tracking-widest text-xs flex items-center gap-2">
+                                <Sparkles className="text-amber-500" size={14} /> 1. Select Issue Category
+                            </h3>
+                            {formData.category && (
+                                <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-indigo-600 text-xs font-black">
+                                    Selection saved
+                                </motion.span>
+                            )}
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {CATEGORIES.map((cat, idx) => (
+                                <motion.div
+                                    key={cat.id}
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: idx * 0.05 }}
+                                    whileTap={{ scale: 0.98 }}
+                                    onClick={() => setFormData(prev => ({ ...prev, category: cat.id }))}
+                                    className={`category-card-premium glass-card rounded-[2.5rem] p-8 cursor-pointer border-2 ${
+                                        formData.category === cat.id ? 'border-indigo-600 ring-4 ring-indigo-50' : 'border-transparent'
+                                    }`}
+                                >
+                                    <div className="text-4xl mb-4">{cat.icon}</div>
+                                    <h4 className="text-xl font-black text-slate-900 mb-2">{cat.label}</h4>
+                                    <p className="text-slate-500 font-medium text-sm leading-relaxed">{cat.description}</p>
+                                </motion.div>
+                            ))}
+                        </div>
+                    </section>
+
+                    {/* Scale Selection */}
+                    <section className="glass-card rounded-[3rem] p-10">
+                        <h3 className="font-black text-slate-900 uppercase tracking-widest text-xs mb-8 flex items-center gap-2">
+                            <Target className="text-indigo-500" size={14} /> 2. Scale of Assistance
+                        </h3>
+                        <div className="flex flex-wrap gap-4">
+                            {SCALES.map((scale) => (
+                                <button
+                                    key={scale.id}
+                                    type="button"
+                                    onClick={() => setFormData(prev => ({ ...prev, scale: scale.id }))}
+                                    className={`scale-btn-premium flex-1 min-w-[150px] p-6 rounded-3xl border-2 text-left flex items-center gap-4 ${
+                                        formData.scale === scale.id ? 'border-indigo-600 ring-4 ring-indigo-50' : 'border-slate-100 bg-slate-50/50'
+                                    }`}
+                                >
+                                    <div className="scale-dot shadow-inner shadow-slate-200" style={{ backgroundColor: scale.color }} />
+                                    <div>
+                                        <div className="font-black text-slate-900 text-lg">{scale.label}</div>
+                                        <div className="text-slate-500 text-xs font-bold uppercase tracking-tight">{scale.description}</div>
+                                    </div>
+                                </button>
+                            ))}
+                        </div>
+                    </section>
+
+                    {/* Detailed Description */}
+                    <section className="glass-card rounded-[3rem] p-10">
+                        <label className="font-black text-slate-900 uppercase tracking-widest text-xs mb-6 block">
+                            3. Issue Description
+                        </label>
+                        <textarea
+                            required
+                            className="w-full bg-slate-50/50 rounded-3xl p-8 text-xl font-medium text-slate-800 placeholder:text-slate-300 border-2 border-slate-100 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-50 transition-all outline-none modern-textarea"
+                            rows={5}
+                            placeholder="Tell us what's happening. The more detail, the faster an NGO can help..."
+                            value={formData.description}
+                            onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                        />
+                    </section>
+
+                    {/* Location Detection */}
+                    <section className="glass-card rounded-[3rem] p-10">
+                        <div className="flex items-center justify-between mb-8">
+                            <label className="font-black text-slate-900 uppercase tracking-widest text-xs">
+                                4. Location Integration
+                            </label>
+                            <button 
+                                type="button"
+                                onClick={detectLocation}
+                                disabled={detecting}
+                                className="text-indigo-600 font-extrabold text-sm flex items-center gap-2 hover:underline disabled:opacity-50"
+                            >
+                                {detecting ? <Loader2 size={16} className="animate-spin" /> : <Target size={16} />}
+                                {detecting ? 'Resolving Address...' : 'Detect My Location'}
+                            </button>
+                        </div>
+                        <div className="relative">
+                            <MapPin className="absolute left-6 top-6 text-slate-300" size={24} />
+                            <input
+                                required
+                                type="text"
+                                className="w-full bg-slate-50/50 rounded-[2.5rem] p-6 pl-16 text-lg font-bold text-slate-800 border-2 border-slate-100 focus:border-indigo-500 outline-none transition-all"
+                                placeholder="Detect automatically or enter manually..."
+                                value={formData.address}
+                                onChange={(e) => setFormData(prev => ({ ...prev, address: e.target.value }))}
+                            />
+                        </div>
+                        
+                        <div className="mt-8 p-6 bg-indigo-50/50 rounded-2xl border border-indigo-100 flex gap-4">
+                            <ShieldCheck className="text-indigo-500 shrink-0" size={20} />
+                            <p className="text-indigo-900/60 text-sm font-bold leading-snug">
+                                Only verified NGOs in your immediate radius will see this request. No personal financial data is shared.
+                            </p>
+                        </div>
+                    </section>
+
+                    {/* Submit Button */}
+                    <motion.button
+                        whileHover={{ y: -4, scale: 1.01 }}
+                        whileTap={{ scale: 0.98 }}
+                        type="submit"
+                        disabled={loading || !formData.description || !formData.category}
+                        className="w-full bg-slate-900 text-white rounded-[2.5rem] py-8 text-2xl font-black flex items-center justify-center gap-4 shadow-3xl shadow-slate-200 hover:bg-indigo-600 transition-all disabled:opacity-50 disabled:hover:bg-slate-900"
+                    >
+                        {loading ? (
+                            <Loader2 className="animate-spin" size={32} />
+                        ) : (
+                            <>
+                                <Send size={28} />
+                                <span>Broadcast Request</span>
+                            </>
+                        )}
+                    </motion.button>
+                </form>
             </div>
-
-            <form onSubmit={handleSubmit} className="ngo-form">
-                {/* Category Selection */}
-                <div className="form-section">
-                    <label>Issue Category *</label>
-                    <div className="category-grid">
-                        {CATEGORIES.map(cat => (
-                            <div
-                                key={cat.id}
-                                className={`category-card glass-panel ${formData.category === cat.id ? 'selected' : ''}`}
-                                onClick={() => setFormData({ ...formData, category: cat.id })}
-                            >
-                                <span className="cat-icon">{cat.icon}</span>
-                                <h4>{cat.label}</h4>
-                                <p>{cat.description}</p>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-
-                {/* Description */}
-                <div className="form-section">
-                    <label>Describe the Issue *</label>
-                    <textarea
-                        className="form-input"
-                        rows={4}
-                        placeholder="Please describe the issue in detail. Include location specifics, urgency, and any other relevant information..."
-                        value={formData.description}
-                        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    />
-                </div>
-
-                {/* Scale */}
-                <div className="form-section">
-                    <label>Scale of Issue</label>
-                    <div className="scale-options">
-                        {SCALES.map(scale => (
-                            <div
-                                key={scale.id}
-                                className={`scale-option glass-panel ${formData.scale === scale.id ? 'selected' : ''}`}
-                                onClick={() => setFormData({ ...formData, scale: scale.id })}
-                                style={{ '--scale-color': scale.color }}
-                            >
-                                <div className="scale-indicator"></div>
-                                <div>
-                                    <h4>{scale.label}</h4>
-                                    <p>{scale.description}</p>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-
-                {/* Address */}
-                <div className="form-section">
-                    <label>
-                        <MapPin size={16} /> Location / Address
-                    </label>
-                    <input
-                        type="text"
-                        className="form-input"
-                        placeholder="Enter the address or landmark"
-                        value={formData.address}
-                        onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                    />
-                </div>
-
-                {/* Info Box */}
-                <div className="info-box glass-panel">
-                    <AlertCircle size={20} />
-                    <div>
-                        <strong>What happens next?</strong>
-                        <p>A matching NGO will review your request within 24 hours. They will contact you directly if they can help.</p>
-                    </div>
-                </div>
-
-                {/* Submit */}
-                <button type="submit" className="btn btn-primary btn-lg submit-btn" disabled={loading}>
-                    {loading ? <><Loader className="spin" size={18} /> Submitting...</> : 'Submit Request'}
-                </button>
-            </form>
         </div>
     );
 };
