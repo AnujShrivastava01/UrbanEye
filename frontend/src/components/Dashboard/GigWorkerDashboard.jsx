@@ -5,9 +5,11 @@ import {
     LayoutDashboard, LogOut, Menu, X, RefreshCw, ChevronRight, ChevronLeft,
     Briefcase, DollarSign, Star, TrendingUp, MapPin, Clock, CheckCircle,
     ArrowUpRight, Award, Target, Zap, Map as MapIcon, Calendar, Trophy,
-    Timer, Wallet, Activity, Eye, Play, AlertCircle, Package, Route
+    Timer, Wallet, Activity, Eye, Play, AlertCircle, Package, Route, Settings
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import SettingsSection from './SettingsSection';
+import VoiceCommandCenter from './VoiceCommandCenter';
 
 const GigWorkerDashboard = () => {
     const { user, logout } = useAuth();
@@ -46,12 +48,56 @@ const GigWorkerDashboard = () => {
 
     const handleLogout = () => { logout(); navigate('/login'); };
 
+    const handleVoiceCommand = (cmd, speak) => {
+        if (cmd.includes('overview') || cmd.includes('dashboard') || cmd.includes('home')) {
+            setActiveView('overview');
+            speak('Opening gig worker overview');
+            return true;
+        }
+        if (cmd.includes('available') || cmd.includes('new jobs') || cmd.includes('work')) {
+            setActiveView('available');
+            speak('Showing available jobs near you');
+            return true;
+        }
+        if (cmd.includes('active') || cmd.includes('my jobs') || cmd.includes('current')) {
+            setActiveView('active');
+            speak('Showing your active tasks');
+            return true;
+        }
+        if (cmd.includes('earning') || cmd.includes('money') || cmd.includes('balance') || cmd.includes('wallet')) {
+            setActiveView('earnings');
+            speak('Opening your earnings and wallet');
+            return true;
+        }
+        if (cmd.includes('map') || cmd.includes('location')) {
+            setActiveView('map');
+            speak('Opening job map');
+            return true;
+        }
+        if (cmd.includes('setting')) {
+            setActiveView('settings');
+            speak('Opening your profile settings');
+            return true;
+        }
+        if (cmd.includes('logout') || cmd.includes('sign out')) {
+            speak('Signing you out. Have a great day!');
+            setTimeout(handleLogout, 2000);
+            return true;
+        }
+        if (cmd.includes('how much') || cmd.includes('status') || cmd.includes('earnings')) {
+            speak(`You have earned ₹${stats.todayEarnings} today with a rating of ${stats.rating} stars. Keep it up!`);
+            return true;
+        }
+        return false;
+    };
+
     const navItems = [
         { id: 'overview', icon: LayoutDashboard, label: 'Overview' },
         { id: 'available', icon: Briefcase, label: 'Available Jobs' },
         { id: 'active', icon: Activity, label: 'Active Jobs' },
         { id: 'earnings', icon: Wallet, label: 'Earnings' },
         { id: 'map', icon: MapIcon, label: 'Job Map' },
+        { id: 'settings', icon: Settings, label: 'Settings' },
     ];
 
     const priorityConfig = {
@@ -156,6 +202,7 @@ const GigWorkerDashboard = () => {
                             {activeView === 'active' && 'Active Jobs'}
                             {activeView === 'earnings' && 'Earnings & Stats'}
                             {activeView === 'map' && 'Job Map'}
+                            {activeView === 'settings' && 'Account Settings'}
                         </h1>
                         <p className="text-sm text-slate-500 mt-0.5">Welcome back, {user?.name}</p>
                     </div>
@@ -542,10 +589,25 @@ const GigWorkerDashboard = () => {
                                 </div>
                             )}
 
+                            {activeView === 'settings' && <SettingsSection />}
+
                         </motion.div>
                     </AnimatePresence>
                 </div>
             </main>
+
+            <VoiceCommandCenter 
+                onCommand={handleVoiceCommand}
+                commands={[
+                    "Open Dashboard",
+                    "Available Jobs",
+                    "Active Tasks",
+                    "How much I earned?",
+                    "View Job Map",
+                    "Open Settings",
+                    "Logout"
+                ]}
+            />
         </div>
     );
 };

@@ -7,10 +7,12 @@ import {
     AlertTriangle, ChevronRight, ChevronLeft, Search, Filter,
     ArrowUpRight, ArrowDownRight, Zap, TrendingUp, Eye,
     Navigation, Play, CircleCheck, Timer, Star, BarChart3, Map as MapIcon,
-    Calendar, Award, Target, Route, BookOpen, CheckCircle2
+    Calendar, Award, Target, Route, BookOpen, CheckCircle2, Settings
 } from 'lucide-react';
 import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
+import SettingsSection from './SettingsSection';
+import VoiceCommandCenter from './VoiceCommandCenter';
 
 const API_BASE = (import.meta.env.VITE_API_URL || 'http://localhost:5000') + '/api/v1';
 
@@ -105,6 +107,49 @@ const FieldOfficerDashboard = () => {
 
     const handleLogout = () => { logout(); navigate('/login'); };
 
+    const handleVoiceCommand = (cmd, speak) => {
+        if (cmd.includes('overview') || cmd.includes('dashboard') || cmd.includes('home')) {
+            setActiveView('overview');
+            speak('Opening field officer overview');
+            return true;
+        }
+        if (cmd.includes('task') || cmd.includes('assignment') || cmd.includes('work')) {
+            setActiveView('tasks');
+            speak('Showing your assigned tasks');
+            return true;
+        }
+        if (cmd.includes('map') || cmd.includes('location') || cmd.includes('route')) {
+            setActiveView('map');
+            speak('Opening task map and navigation');
+            return true;
+        }
+        if (cmd.includes('history') || cmd.includes('complete') || cmd.includes('past')) {
+            setActiveView('history');
+            speak('Showing your completed task history');
+            return true;
+        }
+        if (cmd.includes('setting')) {
+            setActiveView('settings');
+            speak('Opening your profile settings');
+            return true;
+        }
+        if (cmd.includes('logout') || cmd.includes('sign out')) {
+            speak('Signing you out. Stay safe on the field!');
+            setTimeout(handleLogout, 2000);
+            return true;
+        }
+        if (cmd.includes('refresh') || cmd.includes('reload')) {
+            fetchTasks();
+            speak('Refreshing your task list');
+            return true;
+        }
+        if (cmd.includes('status') || cmd.includes('how many')) {
+            speak(`You have ${stats.assigned} assigned tasks, ${stats.inProgress} currently in progress, and ${stats.resolved} completed. There are ${stats.highSev} high priority tasks.`);
+            return true;
+        }
+        return false;
+    };
+
     const navItems = [
         { id: 'overview', icon: LayoutDashboard, label: 'Overview' },
         { id: 'tasks', icon: FileText, label: 'My Tasks' },
@@ -112,6 +157,7 @@ const FieldOfficerDashboard = () => {
         { id: 'completed', icon: CheckCircle, label: 'Completed' },
         { id: 'performance', icon: BarChart3, label: 'Performance' },
         { id: 'activity', icon: BookOpen, label: 'Activity Log' },
+        { id: 'settings', icon: Settings, label: 'Settings' },
     ];
 
     const statCards = [
@@ -214,6 +260,7 @@ const FieldOfficerDashboard = () => {
                             {activeView === 'completed' && 'Completed Tasks'}
                             {activeView === 'performance' && 'Performance Metrics'}
                             {activeView === 'activity' && 'Activity Log'}
+                            {activeView === 'settings' && 'Account Settings'}
                         </h1>
                         <p className="text-sm text-slate-500 mt-0.5">
                             {new Date().toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
@@ -798,6 +845,8 @@ const FieldOfficerDashboard = () => {
                                         </div>
                                     </div>
                                 )}
+
+                                {activeView === 'settings' && <SettingsSection />}
                             </motion.div>
                         </AnimatePresence>
                     )}
@@ -948,6 +997,20 @@ const FieldOfficerDashboard = () => {
                     </motion.div>
                 )}
             </AnimatePresence>
+
+            <VoiceCommandCenter 
+                onCommand={handleVoiceCommand}
+                commands={[
+                    "Open Dashboard",
+                    "My Assignments",
+                    "Show Task Map",
+                    "Completed History",
+                    "Open Settings",
+                    "How many tasks?",
+                    "Refresh Tasks",
+                    "Logout"
+                ]}
+            />
         </div>
     );
 };

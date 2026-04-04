@@ -17,6 +17,8 @@ import {
 } from 'recharts';
 import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
+import SettingsSection from './SettingsSection';
+import VoiceCommandCenter from './VoiceCommandCenter';
 import 'leaflet/dist/leaflet.css';
 
 // Recharts Custom Tooltip
@@ -65,6 +67,59 @@ const SuperAdminDashboard = () => {
     const [statusStats, setStatusStats] = useState({ open: 0, assigned: 0, in_progress: 0, resolved: 0 });
     const [deptStats, setDeptStats] = useState({});
     const [trendStats, setTrendStats] = useState([]);
+
+    const handleVoiceCommand = (cmd, speak) => {
+        if (cmd.includes('overview') || cmd.includes('dashboard') || cmd.includes('home')) {
+            setActiveView('overview');
+            speak('Opening administrative overview');
+            return true;
+        }
+        if (cmd.includes('analytics') || cmd.includes('statistics') || cmd.includes('charts')) {
+            setActiveView('analytics');
+            speak('Opening system analytics');
+            return true;
+        }
+        if (cmd.includes('map') || cmd.includes('heatmap') || cmd.includes('city view')) {
+            setActiveView('map');
+            speak('Opening global city heatmap');
+            return true;
+        }
+        if (cmd.includes('report') || cmd.includes('incident') || cmd.includes('all reports')) {
+            setActiveView('reports');
+            speak('Showing all incident reports');
+            return true;
+        }
+        if (cmd.includes('seed') || cmd.includes('simulate') || cmd.includes('generate data')) {
+            setActiveView('seed');
+            speak('Opening data seeder utility');
+            return true;
+        }
+        if (cmd.includes('user') || cmd.includes('staff') || cmd.includes('management')) {
+            setActiveView('users');
+            speak('Opening user management');
+            return true;
+        }
+        if (cmd.includes('setting') || cmd.includes('profile')) {
+            setActiveView('settings');
+            speak('Opening administrative settings');
+            return true;
+        }
+        if (cmd.includes('logout') || cmd.includes('sign out')) {
+            speak('Logging out of Super Admin dashboard. Session ending.');
+            setTimeout(logout, 2000);
+            return true;
+        }
+        if (cmd.includes('refresh') || cmd.includes('reload')) {
+            fetchDashboardData();
+            speak('Refreshing all system data');
+            return true;
+        }
+        if (cmd.includes('status') || cmd.includes('how many')) {
+            speak(`Current system status: ${stats.totalReports} total reports, ${stats.pendingReports} pending, and ${stats.resolvedReports} resolved.`);
+            return true;
+        }
+        return false;
+    };
 
     // Reports View State
     const [searchTerm, setSearchTerm] = useState('');
@@ -317,6 +372,7 @@ const SuperAdminDashboard = () => {
                     {activeView === 'reports' && <ReportsView reports={currentReports} searchTerm={searchTerm} setSearchTerm={setSearchTerm} statusFilter={statusFilter} setStatusFilter={setStatusFilter} paginate={paginate} currentPage={currentPage} totalReports={filteredReportsList.length} reportsPerPage={reportsPerPage} />}
                     {activeView === 'seed' && <SeederView seederCity={seederCity} setSeederCity={setSeederCity} seederCount={seederCount} setSeederCount={setSeederCount} seedReports={seedReports} seederLoading={seederLoading} seedAll={seedAll} fullSeederLoading={fullSeederLoading} />}
                     {activeView === 'users' && <UserManagementView />}
+                    {activeView === 'settings' && <SettingsSection />}
                 </div>
             </main>
         </div>
@@ -1250,6 +1306,22 @@ const UserManagementView = () => {
                     </motion.div>
                 )}
             </AnimatePresence>
+
+            <VoiceCommandCenter 
+                onCommand={handleVoiceCommand}
+                commands={[
+                    "Open Dashboard",
+                    "Show Analytics",
+                    "View Heatmap",
+                    "All Reports",
+                    "User Management",
+                    "Data Seeder",
+                    "Open Settings",
+                    "How many reports?",
+                    "Refresh Data",
+                    "Sign out"
+                ]}
+            />
         </div>
     );
 };

@@ -93,7 +93,13 @@ const Signup = () => {
             const result = await pendingSignup;
             setShowServerBoot(false);
             if (result.success) {
-                navigate('/login');
+                // If the result contains a user (Google Signup), go to dashboard
+                // Otherwise (Email Signup), go to login
+                if (result.user) {
+                    navigate('/dashboard');
+                } else {
+                    navigate('/login');
+                }
             } else {
                 setError(result.error);
             }

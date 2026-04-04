@@ -5,10 +5,12 @@ import {
     LayoutDashboard, Users, FileText, LogOut, Menu, X, Search, MapPin, RefreshCw,
     Clock, CheckCircle, Activity, ChevronRight, ChevronLeft, Building, UserPlus,
     TrendingUp, AlertTriangle, BarChart3, Eye, Filter, Calendar, Award, Target,
-    ArrowUpRight, ArrowDownRight, Zap, User, CheckCircle2, XCircle
+    ArrowUpRight, ArrowDownRight, Zap, User, CheckCircle2, XCircle, Settings
 } from 'lucide-react';
 import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
+import SettingsSection from './SettingsSection';
+import VoiceCommandCenter from './VoiceCommandCenter';
 
 const API_BASE = (import.meta.env.VITE_API_URL || 'http://localhost:5000') + '/api/v1';
 
@@ -122,11 +124,55 @@ const DeptHeadDashboard = () => {
 
     const handleLogout = () => { logout(); navigate('/login'); };
 
+    const handleVoiceCommand = (cmd, speak) => {
+        if (cmd.includes('overview') || cmd.includes('dashboard') || cmd.includes('home')) {
+            setActiveView('overview');
+            speak('Opening department overview');
+            return true;
+        }
+        if (cmd.includes('analytics') || cmd.includes('statistics') || cmd.includes('charts')) {
+            setActiveView('analytics');
+            speak('Opening department analytics');
+            return true;
+        }
+        if (cmd.includes('officer') || cmd.includes('team') || cmd.includes('staff')) {
+            setActiveView('officers');
+            speak('Opening officer management');
+            return true;
+        }
+        if (cmd.includes('report') || cmd.includes('incident') || cmd.includes('department reports')) {
+            setActiveView('reports');
+            speak('Showing all department reports');
+            return true;
+        }
+        if (cmd.includes('setting')) {
+            setActiveView('settings');
+            speak('Opening your profile settings');
+            return true;
+        }
+        if (cmd.includes('logout') || cmd.includes('sign out')) {
+            speak('Signing you out. Goodbye!');
+            setTimeout(handleLogout, 2000);
+            return true;
+        }
+        if (cmd.includes('refresh') || cmd.includes('reload')) {
+            fetchDashboardData();
+            speak('Refreshing department data');
+            return true;
+        }
+        if (cmd.includes('status') || cmd.includes('how many')) {
+            speak(`Department summary: Total ${stats.total} reports, ${stats.pending} pending, ${stats.resolved} resolved. Resolution rate is ${stats.resolutionRate} percent.`);
+            return true;
+        }
+        return false;
+    };
+
     const navItems = [
         { id: 'overview', icon: LayoutDashboard, label: 'Overview' },
         { id: 'reports', icon: FileText, label: 'Department Reports' },
         { id: 'team', icon: Users, label: 'Field Team' },
-        { id: 'analytics', icon: BarChart3, label: 'Analytics' }
+        { id: 'analytics', icon: BarChart3, label: 'Analytics' },
+        { id: 'settings', icon: Settings, label: 'Settings' }
     ];
 
     return (
@@ -221,6 +267,7 @@ const DeptHeadDashboard = () => {
                             {activeView === 'reports' && 'Manage Reports'}
                             {activeView === 'team' && 'Field Team Management'}
                             {activeView === 'analytics' && 'Analytics & Insights'}
+                            {activeView === 'settings' && 'Account Settings'}
                         </h1>
                         <p className="text-sm text-slate-500 mt-0.5">Welcome back, {user?.name}</p>
                     </div>
@@ -644,6 +691,8 @@ const DeptHeadDashboard = () => {
                                     </div>
                                 )}
 
+                                {activeView === 'settings' && <SettingsSection />}
+
                             </motion.div>
                         </AnimatePresence>
                     )}
@@ -870,6 +919,20 @@ const DeptHeadDashboard = () => {
                     </motion.div>
                 )}
             </AnimatePresence>
+
+            <VoiceCommandCenter 
+                onCommand={handleVoiceCommand}
+                commands={[
+                    "Open Dashboard",
+                    "Department Analytics",
+                    "View Officers",
+                    "All Reports",
+                    "Open Settings",
+                    "How many reports?",
+                    "Refresh Data",
+                    "Logout"
+                ]}
+            />
         </div>
     );
 };

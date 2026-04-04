@@ -101,7 +101,7 @@ const Navbar = () => {
                                 AI Analysis
                             </NavLink>
 
-                            {isAuthenticated() && user?.role !== 'civilian' && (
+                            {isAuthenticated() && (
                                 <NavLink
                                     to={dashboardPath}
                                     className={({ isActive }) => `
@@ -236,7 +236,7 @@ const Navbar = () => {
                             </div>
                             <ChevronRight size={18} className="text-slate-300" />
                         </NavLink>
-                        {isAuthenticated() && user?.role !== 'civilian' && (
+                        {isAuthenticated() && (
                             <NavLink
                                 to={dashboardPath}
                                 onClick={() => setIsMobileMenuOpen(false)}

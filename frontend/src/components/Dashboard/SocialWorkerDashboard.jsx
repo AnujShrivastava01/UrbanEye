@@ -6,9 +6,11 @@ import {
     Heart, Users, TrendingUp, MapPin, Clock, CheckCircle, Star,
     ArrowUpRight, Award, Target,  Map as MapIcon, Calendar,
     HandHeart, UserCheck, AlertCircle, Eye, Play, Package, BookOpen,
-    Activity, Shield, Home, Baby, Utensils, GraduationCap, Briefcase, Trophy
+    Activity, Shield, Home, Baby, Utensils, GraduationCap, Briefcase, Trophy, Settings
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import SettingsSection from './SettingsSection';
+import VoiceCommandCenter from './VoiceCommandCenter';
 
 const SocialWorkerDashboard = () => {
     const { user, logout } = useAuth();
@@ -51,12 +53,56 @@ const SocialWorkerDashboard = () => {
 
     const handleLogout = () => { logout(); navigate('/login'); };
 
+    const handleVoiceCommand = (cmd, speak) => {
+        if (cmd.includes('overview') || cmd.includes('dashboard') || cmd.includes('home')) {
+            setActiveView('overview');
+            speak('Opening social worker overview');
+            return true;
+        }
+        if (cmd.includes('request') || cmd.includes('help') || cmd.includes('new cases')) {
+            setActiveView('requests');
+            speak('Showing pending help requests');
+            return true;
+        }
+        if (cmd.includes('active') || cmd.includes('my cases') || cmd.includes('current')) {
+            setActiveView('active');
+            speak('Showing your active social cases');
+            return true;
+        }
+        if (cmd.includes('volunteer') || cmd.includes('team')) {
+            setActiveView('volunteers');
+            speak('Opening volunteer management');
+            return true;
+        }
+        if (cmd.includes('impact') || cmd.includes('stats') || cmd.includes('achievement')) {
+            setActiveView('impact');
+            speak('Opening your community impact statistics');
+            return true;
+        }
+        if (cmd.includes('setting')) {
+            setActiveView('settings');
+            speak('Opening your profile settings');
+            return true;
+        }
+        if (cmd.includes('logout') || cmd.includes('sign out')) {
+            speak('Signing you out. Thank you for your service!');
+            setTimeout(handleLogout, 2000);
+            return true;
+        }
+        if (cmd.includes('status') || cmd.includes('how many')) {
+            speak(`Progress update: You have ${stats.pending} pending requests, ${stats.inProgress} active cases, and you've helped ${stats.totalHelped} people so far.`);
+            return true;
+        }
+        return false;
+    };
+
     const navItems = [
         { id: 'overview', icon: LayoutDashboard, label: 'Overview' },
         { id: 'requests', icon: HandHeart, label: 'Help Requests' },
         { id: 'active', icon: Activity, label: 'Active Cases' },
         { id: 'volunteers', icon: Users, label: 'Volunteers' },
         { id: 'impact', icon: Award, label: 'Impact Stats' },
+        { id: 'settings', icon: Settings, label: 'Settings' },
     ];
 
     const priorityConfig = {
@@ -170,6 +216,7 @@ const SocialWorkerDashboard = () => {
                             {activeView === 'active' && 'Active Cases'}
                             {activeView === 'volunteers' && 'Volunteer Management'}
                             {activeView === 'impact' && 'Impact & Statistics'}
+                            {activeView === 'settings' && 'Account Settings'}
                         </h1>
                         <p className="text-sm text-slate-500 mt-0.5">Making a difference together</p>
                     </div>
@@ -553,6 +600,8 @@ const SocialWorkerDashboard = () => {
                                 </div>
                             )}
 
+                            {activeView === 'settings' && <SettingsSection />}
+
                         </motion.div>
                     </AnimatePresence>
                 </div>
@@ -624,6 +673,20 @@ const SocialWorkerDashboard = () => {
                     </motion.div>
                 )}
             </AnimatePresence>
+
+            <VoiceCommandCenter 
+                onCommand={handleVoiceCommand}
+                commands={[
+                    "Open Dashboard",
+                    "New Help Requests",
+                    "Check Active Cases",
+                    "View Volunteers",
+                    "Impact Statistics",
+                    "Open Settings",
+                    "How many cases?",
+                    "Logout"
+                ]}
+            />
         </div>
     );
 };

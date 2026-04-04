@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { ArrowRight, Activity, Map, Upload, Sparkles, Shield, Users, Trophy, Star, ChevronRight, Play, CheckCircle, Zap, Building, MapPin, Download, Smartphone, Eye, Brain, Flame, Wifi, Link2, AlertOctagon, Gauge } from 'lucide-react';
+import { ArrowRight, Activity, Map, Upload, Sparkles, Shield, Users, Trophy, Star, ChevronRight, Play, CheckCircle, Zap, Building, MapPin, Download, Smartphone, Eye, Brain, Flame, Wifi, Link2, AlertOctagon, Gauge, LayoutDashboard } from 'lucide-react';
 import { NavLink, useNavigate, Link } from 'react-router-dom';
 import { motion, useScroll, useTransform, useInView } from 'framer-motion';
 import axios from 'axios';
@@ -15,6 +15,7 @@ const Home = () => {
     const { user, isAuthenticated } = useAuth();
     const navigate = useNavigate();
     const [leaderboard, setLeaderboard] = useState([]);
+    const [leaderboardType, setLeaderboardType] = useState('citizens'); // 'citizens' | 'municipalities'
     const [stats, setStats] = useState({ totalReports: 1240, resolvedReports: 890, activeUsers: 350 });
     const heroRef = useRef(null);
     const featuresRef = useRef(null);
@@ -36,13 +37,22 @@ const Home = () => {
         fetchStats();
     }, []);
 
+    const municipalityLeaderboard = [
+        { rank: 1, name: 'Indore, India', efficiency: 98, resolved: '1,245', icon: Building, color: 'from-emerald-400 to-green-600' },
+        { rank: 2, name: 'Gwalior, India', efficiency: 94, resolved: '890', icon: Building, color: 'from-blue-400 to-indigo-600' },
+        { rank: 3, name: 'Canberra, Australia', efficiency: 92, resolved: '756', icon: Building, color: 'from-purple-400 to-pink-600' },
+        { rank: 4, name: 'Delhi NCR, India', efficiency: 89, resolved: '3,450', icon: Building, color: 'from-amber-400 to-orange-600' },
+        { rank: 5, name: 'Mumbai, India', efficiency: 85, resolved: '2,120', icon: Building, color: 'from-rose-400 to-red-600' },
+    ];
+
     const fetchLeaderboard = async () => {
         try {
-            const res = await axios.get(`${API_BASE}/reports/leaderboard`);
+            const res = await axios.get(`${API_BASE}/auth/leaderboard`);
             if (res.data.success) {
                 setLeaderboard(res.data.leaderboard.slice(0, 5));
             }
         } catch (err) {
+            console.error("Failed to fetch leaderboard", err);
             // Use mock data if API fails
             setLeaderboard([
                 { rank: 1, name: 'Aarav Sharma', xp: 125, report_count: 25 },
@@ -198,21 +208,43 @@ const Home = () => {
                                 transition={{ duration: 0.6, delay: 0.4 }}
                                 className="flex flex-wrap items-center gap-4"
                             >
-                                <NavLink
-                                    to="/analyze"
-                                    className="group flex items-center gap-2 sm:gap-3 bg-indigo-600 hover:bg-indigo-700 text-white px-5 sm:px-8 py-3 sm:py-4 rounded-xl sm:rounded-2xl font-bold text-base sm:text-lg shadow-xl shadow-indigo-200 hover:shadow-2xl hover:-translate-y-1 transition-all"
-                                >
-                                    <Sparkles size={20} />
-                                    Try AI Analysis
-                                    <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
-                                </NavLink>
-                                <NavLink
-                                    to={getDashboardRoute()}
-                                    className="group flex items-center gap-2 sm:gap-3 bg-white hover:bg-slate-50 text-slate-700 px-5 sm:px-8 py-3 sm:py-4 rounded-xl sm:rounded-2xl font-bold text-base sm:text-lg border-2 border-slate-200 hover:border-slate-300 transition-all"
-                                >
-                                    <Play size={18} className="text-indigo-600" />
-                                    View Live Map
-                                </NavLink>
+                                {isAuthenticated() ? (
+                                    <>
+                                        <NavLink
+                                            to={getDashboardRoute()}
+                                            className="group flex items-center gap-2 sm:gap-3 bg-indigo-600 hover:bg-indigo-700 text-white px-5 sm:px-8 py-3 sm:py-4 rounded-xl sm:rounded-2xl font-bold text-base sm:text-lg shadow-xl shadow-indigo-200 hover:shadow-2xl hover:-translate-y-1 transition-all"
+                                        >
+                                            <LayoutDashboard size={20} />
+                                            Go to Dashboard
+                                            <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
+                                        </NavLink>
+                                        <NavLink
+                                            to="/analyze"
+                                            className="group flex items-center gap-2 sm:gap-3 bg-white hover:bg-slate-50 text-slate-700 px-5 sm:px-8 py-3 sm:py-4 rounded-xl sm:rounded-2xl font-bold text-base sm:text-lg border-2 border-slate-200 hover:border-slate-300 transition-all"
+                                        >
+                                            <Sparkles size={18} className="text-indigo-600" />
+                                            AI Analysis
+                                        </NavLink>
+                                    </>
+                                ) : (
+                                    <>
+                                        <NavLink
+                                            to="/analyze"
+                                            className="group flex items-center gap-2 sm:gap-3 bg-indigo-600 hover:bg-indigo-700 text-white px-5 sm:px-8 py-3 sm:py-4 rounded-xl sm:rounded-2xl font-bold text-base sm:text-lg shadow-xl shadow-indigo-200 hover:shadow-2xl hover:-translate-y-1 transition-all"
+                                        >
+                                            <Sparkles size={20} />
+                                            Try AI Analysis
+                                            <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
+                                        </NavLink>
+                                        <NavLink
+                                            to={getDashboardRoute()}
+                                            className="group flex items-center gap-2 sm:gap-3 bg-white hover:bg-slate-50 text-slate-700 px-5 sm:px-8 py-3 sm:py-4 rounded-xl sm:rounded-2xl font-bold text-base sm:text-lg border-2 border-slate-200 hover:border-slate-300 transition-all"
+                                        >
+                                            <Play size={18} className="text-indigo-600" />
+                                            View Live Map
+                                        </NavLink>
+                                    </>
+                                )}
                             </motion.div>
 
                             {/* Trust Badges */}
@@ -600,22 +632,41 @@ const Home = () => {
                             animate={isLeaderboardInView ? { opacity: 1, x: 0 } : {}}
                             transition={{ duration: 0.6 }}
                         >
-                            <span className="text-indigo-400 font-bold text-sm uppercase tracking-wider">Community Heroes</span>
+                            <span className="text-indigo-400 font-bold text-sm uppercase tracking-wider">
+                                {leaderboardType === 'citizens' ? 'Community Heroes' : 'City Excellence'}
+                            </span>
                             <h2 className="text-4xl md:text-5xl font-black text-white mt-3 mb-6">
-                                Top Contributors
+                                {leaderboardType === 'citizens' ? 'Top Contributors' : 'Smartest Municipalities'}
                             </h2>
                             <p className="text-xl text-slate-400 mb-8">
-                                Celebrate the citizens making their cities better. Every report earns XP and helps build a safer community.
+                                {leaderboardType === 'citizens'
+                                    ? 'Celebrate the citizens making their cities better. Every report earns XP and helps build a safer community.'
+                                    : 'Tracking city-level performance across India and beyond. Rewarding efficiency, transparency and rapid resolution.'}
                             </p>
-                            <div className="flex items-center gap-4">
-                                <div className="flex items-center gap-2 text-slate-400">
-                                    <Trophy size={20} className="text-amber-400" />
-                                    <span>5 XP per report</span>
-                                </div>
-                                <div className="flex items-center gap-2 text-slate-400">
-                                    <Star size={20} className="text-amber-400" />
-                                    <span>Monthly rewards</span>
-                                </div>
+                            <div className="flex items-center gap-6">
+                                {leaderboardType === 'citizens' ? (
+                                    <>
+                                        <div className="flex items-center gap-2 text-slate-400">
+                                            <Trophy size={20} className="text-amber-400" />
+                                            <span>5 XP per report</span>
+                                        </div>
+                                        <div className="flex items-center gap-2 text-slate-400">
+                                            <Star size={20} className="text-amber-400" />
+                                            <span>Monthly rewards</span>
+                                        </div>
+                                    </>
+                                ) : (
+                                    <>
+                                        <div className="flex items-center gap-2 text-slate-400">
+                                            <Zap size={20} className="text-emerald-400" />
+                                            <span>Resolution Rank</span>
+                                        </div>
+                                        <div className="flex items-center gap-2 text-slate-400">
+                                            <Building size={20} className="text-blue-400" />
+                                            <span>Smart City Index</span>
+                                        </div>
+                                    </>
+                                )}
                             </div>
                         </motion.div>
 
@@ -626,39 +677,81 @@ const Home = () => {
                             transition={{ duration: 0.6, delay: 0.2 }}
                             className="bg-slate-800/50 backdrop-blur-xl rounded-3xl p-6 border border-slate-700"
                         >
-                            <div className="flex items-center justify-between mb-6">
+                            <div className="flex flex-col sm:flex-row items-center justify-between mb-8 gap-4">
                                 <h3 className="text-xl font-bold text-white flex items-center gap-2">
                                     <Trophy size={24} className="text-amber-400" />
-                                    Leaderboard
+                                    Live Rankings
                                 </h3>
-                                <span className="text-xs text-slate-400 bg-slate-700 px-3 py-1 rounded-full">This Week</span>
+
+                                <div className="flex p-1 bg-slate-900/80 rounded-xl border border-slate-700">
+                                    <button
+                                        onClick={() => setLeaderboardType('citizens')}
+                                        className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${leaderboardType === 'citizens' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20' : 'text-slate-400 hover:text-white'}`}
+                                    >
+                                        Citizens
+                                    </button>
+                                    <button
+                                        onClick={() => setLeaderboardType('municipalities')}
+                                        className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${leaderboardType === 'municipalities' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20' : 'text-slate-400 hover:text-white'}`}
+                                    >
+                                        Municipalities
+                                    </button>
+                                </div>
                             </div>
 
-                            <div className="space-y-3">
-                                {leaderboard.map((user, index) => (
-                                    <motion.div
-                                        key={index}
-                                        initial={{ opacity: 0, x: 20 }}
-                                        animate={isLeaderboardInView ? { opacity: 1, x: 0 } : {}}
-                                        transition={{ duration: 0.4, delay: 0.3 + index * 0.1 }}
-                                        className={`flex items-center gap-4 p-4 rounded-2xl transition-all hover:bg-slate-700/50 ${index === 0 ? 'bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/20' : 'bg-slate-700/30'}`}
-                                    >
-                                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-black ${index === 0 ? 'bg-gradient-to-br from-amber-400 to-orange-500 text-white' :
-                                            index === 1 ? 'bg-gradient-to-br from-slate-300 to-slate-400 text-slate-800' :
-                                                index === 2 ? 'bg-gradient-to-br from-amber-600 to-amber-700 text-white' :
-                                                    'bg-slate-600 text-slate-300'
-                                            }`}>
-                                            {index + 1}
-                                        </div>
-                                        <div className="flex-1">
-                                            <p className="font-bold text-white">{user.name}</p>
-                                            <p className="text-sm text-slate-400">{user.report_count} reports</p>
-                                        </div>
-                                        <div className="text-right">
-                                            <p className="font-black text-indigo-400">{user.xp} XP</p>
-                                        </div>
-                                    </motion.div>
-                                ))}
+                            <div className="space-y-3 min-h-[400px]">
+                                {leaderboardType === 'citizens' ? (
+                                    leaderboard.map((user, index) => (
+                                        <motion.div
+                                            key={`citizen-${index}`}
+                                            initial={{ opacity: 0, x: 20 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            transition={{ duration: 0.4, delay: index * 0.05 }}
+                                            className={`flex items-center gap-4 p-4 rounded-2xl transition-all hover:bg-slate-700/50 ${index === 0 ? 'bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/20' : 'bg-slate-700/30'}`}
+                                        >
+                                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-black ${index === 0 ? 'bg-gradient-to-br from-amber-400 to-orange-500 text-white' :
+                                                index === 1 ? 'bg-gradient-to-br from-slate-300 to-slate-400 text-slate-800' :
+                                                    index === 2 ? 'bg-gradient-to-br from-amber-600 to-amber-700 text-white' :
+                                                        'bg-slate-600 text-white'
+                                                }`}>
+                                                {index + 1}
+                                            </div>
+                                            <div className="flex-1">
+                                                <p className="font-bold text-white">{user.name}</p>
+                                                <p className="text-sm text-slate-400">{user.report_count} reports</p>
+                                            </div>
+                                            <div className="text-right">
+                                                <p className="font-black text-indigo-400">{user.xp} XP</p>
+                                            </div>
+                                        </motion.div>
+                                    ))
+                                ) : (
+                                    municipalityLeaderboard.map((city, index) => (
+                                        <motion.div
+                                            key={`city-${index}`}
+                                            initial={{ opacity: 0, x: 20 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            transition={{ duration: 0.4, delay: index * 0.05 }}
+                                            className={`flex items-center gap-4 p-4 rounded-2xl transition-all hover:bg-slate-700/50 ${index === 0 ? 'bg-gradient-to-r from-emerald-500/10 to-green-500/10 border border-emerald-500/20' : 'bg-slate-700/30'}`}
+                                        >
+                                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-black ${index === 0 ? 'bg-gradient-to-br from-emerald-400 to-green-600 text-white' :
+                                                index === 1 ? 'bg-gradient-to-br from-blue-400 to-indigo-600 text-white' :
+                                                    index === 2 ? 'bg-gradient-to-br from-purple-400 to-pink-600 text-white' :
+                                                        'bg-slate-600 text-white'
+                                                }`}>
+                                                {index + 1}
+                                            </div>
+                                            <div className="flex-1">
+                                                <p className="font-bold text-white">{city.name}</p>
+                                                <p className="text-sm text-slate-400">{city.resolved} issues fixed</p>
+                                            </div>
+                                            <div className="text-right">
+                                                <p className="text-xs text-slate-500 font-bold uppercase mb-0.5">Efficiency</p>
+                                                <p className="font-black text-emerald-400">{city.efficiency}%</p>
+                                            </div>
+                                        </motion.div>
+                                    ))
+                                )}
                             </div>
 
                             <NavLink
@@ -909,7 +1002,7 @@ const Home = () => {
                             <span className="text-indigo-400 font-bold text-sm uppercase tracking-wider">About Us</span>
                         </motion.div>
                         <h2 className="text-3xl sm:text-5xl md:text-7xl font-black text-white mb-4 sm:mb-6">
-                            Team <span className="bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">Solaris</span>
+                            Team <span className="bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">Thank You</span>
                         </h2>
                         <p className="text-lg sm:text-2xl text-slate-300">
                             From <span className="font-bold text-white">MITS Gwalior</span>

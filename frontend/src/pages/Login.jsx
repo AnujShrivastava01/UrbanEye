@@ -56,7 +56,7 @@ const Login = () => {
         onSuccess: async (credentialResponse) => {
             const result = await googleLogin(credentialResponse);
             if (result.success) {
-                navigate(from, { replace: true });
+                navigate(getRedirectPath(result.user), { replace: true });
             } else {
                 setError(result.error);
             }
