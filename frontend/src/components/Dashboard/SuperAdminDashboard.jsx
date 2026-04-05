@@ -375,6 +375,22 @@ const SuperAdminDashboard = () => {
                     {activeView === 'settings' && <SettingsSection />}
                 </div>
             </main>
+
+            <VoiceCommandCenter 
+                onCommand={handleVoiceCommand}
+                commands={[
+                    "Open Dashboard",
+                    "Show Analytics",
+                    "View Heatmap",
+                    "All Reports",
+                    "User Management",
+                    "Data Seeder",
+                    "Open Settings",
+                    "How many reports?",
+                    "Refresh Data",
+                    "Sign out"
+                ]}
+            />
         </div>
     );
 };
@@ -1306,22 +1322,6 @@ const UserManagementView = () => {
                     </motion.div>
                 )}
             </AnimatePresence>
-
-            <VoiceCommandCenter 
-                onCommand={handleVoiceCommand}
-                commands={[
-                    "Open Dashboard",
-                    "Show Analytics",
-                    "View Heatmap",
-                    "All Reports",
-                    "User Management",
-                    "Data Seeder",
-                    "Open Settings",
-                    "How many reports?",
-                    "Refresh Data",
-                    "Sign out"
-                ]}
-            />
         </div>
     );
 };
